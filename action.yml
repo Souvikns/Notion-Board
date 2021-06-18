@@ -1,0 +1,17 @@
+name: 'Notion Board'
+author: Souvik De
+description: 'Sync your github issues with notion database'
+branding:
+  color: gray-dark
+  icon: disc
+inputs:
+  NOTION_API_KEY:
+    description: 'Your notion API Key'
+    requried: true
+  NOTION_DATABSE:
+    description: 'Your Notion Database ID'
+    requried: true
+  
+runs:
+  using: node12
+  main: build/index.js
