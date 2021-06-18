@@ -12,5 +12,5 @@ jobs:
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          NOTION_DATABSE: ${{ secrets.NOTION_DATABSE }}
+          NOTION_DATABASE: ${{ secrets.NOTION_DATABASE }}
           
