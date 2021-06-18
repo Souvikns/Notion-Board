@@ -2006,8 +2006,7 @@ const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB
 const run = async () => {
     if (!token)
         throw new Error("Github token not found");
-    const octokit = github.getOctokit(token);
-    console.log(octokit);
+    console.log(github.context.payload.issue);
 };
 exports.run = run;
 exports.run()
