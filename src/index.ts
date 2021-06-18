@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { eventType } from './util';
+import { Issues } from './models';
 
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
@@ -11,7 +12,10 @@ export const run = async () => {
 	console.log("EVENT NAME", process.env.GITHUB_EVENT_NAME);
 	console.log("ACTION", action);
 	if (!eventName || !action) throw new Error("Event Name missing");
-	console.log(eventType(eventName, action));
+	switch (eventType(eventName, action)) {
+		case Issues().opened():
+			console.log("New Issue Opened and new page added in notion");
+	}
 }
 
 run()

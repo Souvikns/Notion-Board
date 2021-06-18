@@ -2003,6 +2003,7 @@ exports.run = void 0;
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const util_1 = __webpack_require__(758);
+const models_1 = __webpack_require__(870);
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
 const run = async () => {
@@ -2013,7 +2014,10 @@ const run = async () => {
     console.log("ACTION", action);
     if (!eventName || !action)
         throw new Error("Event Name missing");
-    console.log(util_1.eventType(eventName, action));
+    switch (util_1.eventType(eventName, action)) {
+        case models_1.Issues().opened():
+            console.log("New Issue Opened and new page added in notion");
+    }
 };
 exports.run = run;
 exports.run()
@@ -9240,6 +9244,55 @@ function removeHook(state, name, method) {
   state.registry[name].splice(index, 1);
 }
 
+
+/***/ }),
+
+/***/ 870:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Issues = void 0;
+const Issues = () => {
+    const event = "issues";
+    return {
+        opened: () => `${event}.opened`,
+        edited: () => `${event}.edited`,
+        deleted: () => `${event}.deleted`,
+        closed: () => `${event}.closed`,
+        reopened: () => `${event}.reopened`
+    };
+};
+exports.Issues = Issues;
+// export interface Label {
+// 	color: string,
+// 	default: boolean,
+// 	description: string,
+// 	name: string,
+// 	node_id: string,
+// 	url: string
+// }
+// export class Issue {
+// 	private _title: string;
+// 	private _body: string;
+// 	private _url: string;
+// 	private _id: number;
+// 	private _labels: Array<Label>
+// 	constructor(id: number, title: string, body: string, url: string, labels: Array<Label>) {
+// 		this._title = title;
+// 		this._body = body;
+// 		this._url = url;
+// 		this._id = id;
+// 		this._labels = labels;
+// 	}
+// 	get title(): string { return this._title };
+// 	get body(): string { return this._body };
+// 	get url(): string { return this._url };
+// 	get id(): number { return this._id };
+// 	get labels(): Array<Label> { return this._labels };
+// }
+//# sourceMappingURL=models.js.map
 
 /***/ }),
 
