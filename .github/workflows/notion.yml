@@ -1,6 +1,7 @@
 name: Notion Board
 on:
   issues:
+  issue_comment:
 jobs:
   build:
     runs-on: ubuntu-latest
