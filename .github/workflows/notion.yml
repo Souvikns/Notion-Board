@@ -1,0 +1,14 @@
+name: Notion Board
+on:
+  issues:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: action/checkout@v2
+      - name: Notion Board
+        uses: Souvikns/Notion-Board@v1.0.0
+        env: 
+          NOTION_API_KEY: ${{secrets.NOTION_TOKEN}}
+          NOTION_DATABSE: ${{secrets.NOTION_DATABSE}}
+          
