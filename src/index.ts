@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { eventType } from './util';
 import { Issues } from './models';
+import { Notion } from './notion';
 
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
@@ -10,19 +11,32 @@ const notionDatabase = process.env.NOTION_DATABASE || core.getInput('NOTION_DATA
 
 export const run = async () => {
 	if (!token) throw new Error("Github token not found");
+	if (!notionApiKey) throw new Error("Notion API Key missing");
+	if (!notionDatabase) throw new Error("Notion Database ID missing");
 	const action = github.context.payload.action;
 	console.log("EVENT NAME", process.env.GITHUB_EVENT_NAME);
 	console.log("ACTION", action);
 	if (!eventName || !action) throw new Error("Event Name or action missing");
-	await main(eventType(eventName, action));
+	await main(eventType(eventName, action), github.context.payload.issue);
 	console.log(typeof notionApiKey);
 	console.log(typeof notionDatabase);
 }
 
-const main = async (eventType: string) => {
+const main = async (eventType: string, issue: any) => {
+	let notion = Notion(notionApiKey, notionDatabase, issue);
 	switch (eventType) {
 		case Issues().opened():
-			console.log("New Issue Opened and new page added in notion");
+			return await notion.issueCreated();
+		case Issues().closed():
+			return await notion.issueClosed();
+		case Issues().edited():
+			return await notion.issueEdited();
+		case Issues().deleted():
+			return await notion.issueDeleted();
+		case Issues().reopened():
+			return await notion.issueRepoened();
+		default:
+			console.log("Something happend that I am not accountable for");
 	}
 }
 

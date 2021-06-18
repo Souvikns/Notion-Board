@@ -1,20 +1,22 @@
+import { Client } from '@notionhq/client';
 
-export const issueCreated = async () => {
-	
-}
+export const Notion = (api_key: string, database_id: string, issue: any) => {
+	const notion = new Client({ auth: api_key });
+	return {
+		issueCreated: async () => {
+			console.log(issue);
+		},
+		issueEdited: async () => {
 
-export const issueEdited = async () => {
+		},
+		issueClosed: async () => {
 
-}
+		},
+		issueDeleted: async () => {
 
-export const issueClosed = async () => {
+		},
+		issueRepoened: async () => {
 
-}
-
-export const issueDeleted = async () => {
-	
-}
-
-export const issueRepoened = () => {
-
+		}
+	}
 }

@@ -1,19 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.issueRepoened = exports.issueDeleted = exports.issueClosed = exports.issueEdited = exports.issueCreated = void 0;
-const issueCreated = async () => {
+exports.Notion = void 0;
+const client_1 = require("@notionhq/client");
+const Notion = (api_key, database_id, issue) => {
+    const notion = new client_1.Client({ auth: api_key });
+    return {
+        issueCreated: async () => {
+            console.log(issue);
+        },
+        issueEdited: async () => {
+        },
+        issueClosed: async () => {
+        },
+        issueDeleted: async () => {
+        },
+        issueRepoened: async () => {
+        }
+    };
 };
-exports.issueCreated = issueCreated;
-const issueEdited = async () => {
-};
-exports.issueEdited = issueEdited;
-const issueClosed = async () => {
-};
-exports.issueClosed = issueClosed;
-const issueDeleted = async () => {
-};
-exports.issueDeleted = issueDeleted;
-const issueRepoened = () => {
-};
-exports.issueRepoened = issueRepoened;
+exports.Notion = Notion;
 //# sourceMappingURL=notion.js.map

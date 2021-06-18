@@ -1,5 +1,7 @@
-export declare const issueCreated: () => Promise<void>;
-export declare const issueEdited: () => Promise<void>;
-export declare const issueClosed: () => Promise<void>;
-export declare const issueDeleted: () => Promise<void>;
-export declare const issueRepoened: () => void;
+export declare const Notion: (api_key: string, database_id: string, issue: any) => {
+    issueCreated: () => Promise<void>;
+    issueEdited: () => Promise<void>;
+    issueClosed: () => Promise<void>;
+    issueDeleted: () => Promise<void>;
+    issueRepoened: () => Promise<void>;
+};
