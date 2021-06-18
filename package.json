@@ -1,0 +1,36 @@
+{
+  "name": "Notion-Board",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "package": "ncc build --source-map"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Souvikns/Notion-Board.git"
+  },
+  "keywords": [
+    "github actions"
+  ],
+  "author": {
+    "name": "Souvik De",
+    "email": "souvikde.ns@gmail.com"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Souvikns/Notion-Board/issues"
+  },
+  "homepage": "https://github.com/Souvikns/Notion-Board#readme",
+  "devDependencies": {
+    "@zeit/ncc": "^0.22.3",
+    "typescript": "^4.3.4"
+  },
+  "dependencies": {
+    "@actions/core": "^1.4.0",
+    "@actions/github": "^5.0.0",
+    "@types/node": "^15.12.3"
+  }
+}
