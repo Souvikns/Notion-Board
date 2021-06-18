@@ -1,4 +1,5 @@
-export declare const Notion: (api_key: string, database_id: string, issue: any) => {
+import { Issue } from './models';
+export declare const Notion: (api_key: string, database_id: string, issue: Issue) => {
     issueCreated: () => Promise<void>;
     issueEdited: () => Promise<void>;
     issueClosed: () => Promise<void>;

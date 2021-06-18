@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { eventType } from './util';
-import { Issues } from './models';
+import { eventType, getIssue } from './util';
+import { Issue, Issues } from './models';
 import { Notion } from './notion';
 
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
@@ -17,12 +17,12 @@ export const run = async () => {
 	console.log("EVENT NAME", process.env.GITHUB_EVENT_NAME);
 	console.log("ACTION", action);
 	if (!eventName || !action) throw new Error("Event Name or action missing");
-	await main(eventType(eventName, action), github.context.payload.issue);
+	await main(eventType(eventName, action), getIssue(github.context.payload.issue));
 	console.log(typeof notionApiKey);
 	console.log(typeof notionDatabase);
 }
 
-const main = async (eventType: string, issue: any) => {
+const main = async (eventType: string, issue: Issue) => {
 	let notion = Notion(notionApiKey, notionDatabase, issue);
 	switch (eventType) {
 		case Issues().opened():
