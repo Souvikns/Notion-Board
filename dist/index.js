@@ -2006,7 +2006,8 @@ const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB
 const run = async () => {
     if (!token)
         throw new Error("Github token not found");
-    console.log(github.context.payload.issue);
+    const payload = JSON.stringify(github.context.payload, undefined, 2);
+    console.log(payload);
 };
 exports.run = run;
 exports.run()
