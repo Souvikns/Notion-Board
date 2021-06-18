@@ -1,0 +1,1 @@
+export const eventType = (event: string, action: string) => `${event}.${action}`; 

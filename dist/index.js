@@ -2002,13 +2002,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
+const util_1 = __webpack_require__(758);
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
+const eventName = process.env.GITHUB_EVENT_NAME;
 const run = async () => {
     if (!token)
         throw new Error("Github token not found");
     const action = github.context.payload.action;
     console.log("EVENT NAME", process.env.GITHUB_EVENT_NAME);
     console.log("ACTION", action);
+    if (!eventName || !action)
+        throw new Error("Event Name missing");
+    console.log(util_1.eventType(eventName, action));
 };
 exports.run = run;
 exports.run()
@@ -7820,6 +7825,19 @@ const request = withDefaults(endpoint.endpoint, {
 exports.request = request;
 //# sourceMappingURL=index.js.map
 
+
+/***/ }),
+
+/***/ 758:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.eventType = void 0;
+const eventType = (event, action) => `${event}.${action}`;
+exports.eventType = eventType;
+//# sourceMappingURL=util.js.map
 
 /***/ }),
 
