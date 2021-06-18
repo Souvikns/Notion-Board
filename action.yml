@@ -8,7 +8,7 @@ inputs:
   NOTION_API_KEY:
     description: 'Your notion API Key'
     requried: true
-  NOTION_DATABSE:
+  NOTION_DATABASE:
     description: 'Your Notion Database ID'
     requried: true
   

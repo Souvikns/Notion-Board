@@ -2006,6 +2006,8 @@ const util_1 = __webpack_require__(758);
 const models_1 = __webpack_require__(870);
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
+const notionApiKey = process.env.NOTION_API_KEY || core.getInput('NOTION_API_KEY');
+const notionDatabase = process.env.NOTION_DATABASE || core.getInput('NOTION_DATABASE');
 const run = async () => {
     if (!token)
         throw new Error("Github token not found");
@@ -2013,13 +2015,18 @@ const run = async () => {
     console.log("EVENT NAME", process.env.GITHUB_EVENT_NAME);
     console.log("ACTION", action);
     if (!eventName || !action)
-        throw new Error("Event Name missing");
-    switch (util_1.eventType(eventName, action)) {
+        throw new Error("Event Name or action missing");
+    await main(util_1.eventType(eventName, action));
+    console.log(typeof notionApiKey);
+    console.log(typeof notionDatabase);
+};
+exports.run = run;
+const main = async (eventType) => {
+    switch (eventType) {
         case models_1.Issues().opened():
             console.log("New Issue Opened and new page added in notion");
     }
 };
-exports.run = run;
 exports.run()
     .then(() => { })
     .catch((err) => {
