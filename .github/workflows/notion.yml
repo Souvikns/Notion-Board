@@ -9,6 +9,7 @@ jobs:
       - name: Notion Board
         uses: ./
         env: 
-          NOTION_API_KEY: ${{secrets.NOTION_TOKEN}}
-          NOTION_DATABSE: ${{secrets.NOTION_DATABSE}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTION_API_KEY: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABSE: ${{ secrets.NOTION_DATABSE }}
           
