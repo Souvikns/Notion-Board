@@ -4934,6 +4934,7 @@ const Notion = (api_key, database_id, issue) => {
         issueRepoened: async () => {
         },
         issueLabeled: async () => {
+            let LabelList = issue.labels.map((el) => ({ name: el.name }));
             const response = await notion.databases.query({
                 database_id: database_id,
                 filter: {
@@ -4949,12 +4950,7 @@ const Notion = (api_key, database_id, issue) => {
                 properties: {
                     //@ts-ignore
                     labels: {
-                        multi_select: [
-                            //@ts-ignore
-                            {
-                                name: 'label',
-                            },
-                        ]
+                        multi_select: LabelList
                     }
                 }
             });
@@ -5034,23 +5030,25 @@ const run = async () => {
 exports.run = run;
 const main = async (eventType, issue) => {
     let notion = notion_1.Notion(notionApiKey, notionDatabase, issue);
-    switch (eventType) {
-        case models_1.Issues().opened():
-            return await notion.issueCreated();
-        case models_1.Issues().closed():
-            return await notion.issueClosed();
-        case models_1.Issues().edited():
-            return await notion.issueEdited();
-        case models_1.Issues().deleted():
-            return await notion.issueDeleted();
-        case models_1.Issues().reopened():
-            return await notion.issueRepoened();
-        case models_1.Issues().labeled():
-            return await notion.issueLabeled();
-        case models_1.Issues().unlabeled():
-            return await notion.issueUnlabeled();
-        default:
-            console.log("Something happend that I am not accountable for");
+    if (eventType.split('.')[0] === 'issues') {
+        switch (eventType) {
+            case models_1.Issues().opened():
+                return await notion.issueCreated();
+            case models_1.Issues().closed():
+                return await notion.issueClosed();
+            case models_1.Issues().edited():
+                return await notion.issueEdited();
+            case models_1.Issues().deleted():
+                return await notion.issueDeleted();
+            case models_1.Issues().reopened():
+                return await notion.issueRepoened();
+            case models_1.Issues().labeled():
+                return await notion.issueLabeled();
+            case models_1.Issues().unlabeled():
+                return await notion.issueUnlabeled();
+            default:
+                console.log("Something happend that I am not accountable for");
+        }
     }
 };
 exports.run()

@@ -20,23 +20,25 @@ export const run = async () => {
 
 const main = async (eventType: string, issue: Issue) => {
 	let notion = Notion(notionApiKey, notionDatabase, issue);
-	switch (eventType) {
-		case Issues().opened():
-			return await notion.issueCreated();
-		case Issues().closed():
-			return await notion.issueClosed();
-		case Issues().edited():
-			return await notion.issueEdited();
-		case Issues().deleted():
-			return await notion.issueDeleted();
-		case Issues().reopened():
-			return await notion.issueRepoened();
-		case Issues().labeled():
-			return await notion.issueLabeled();
-		case Issues().unlabeled():
-			return await notion.issueUnlabeled();
-		default:
-			console.log("Something happend that I am not accountable for");
+	if (eventType.split('.')[0] === 'issues') {
+		switch (eventType) {
+			case Issues().opened():
+				return await notion.issueCreated();
+			case Issues().closed():
+				return await notion.issueClosed();
+			case Issues().edited():
+				return await notion.issueEdited();
+			case Issues().deleted():
+				return await notion.issueDeleted();
+			case Issues().reopened():
+				return await notion.issueRepoened();
+			case Issues().labeled():
+				return await notion.issueLabeled();
+			case Issues().unlabeled():
+				return await notion.issueUnlabeled();
+			default:
+				console.log("Something happend that I am not accountable for");
+		}
 	}
 }
 

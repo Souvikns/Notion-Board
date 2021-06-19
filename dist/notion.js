@@ -51,6 +51,7 @@ const Notion = (api_key, database_id, issue) => {
         issueRepoened: async () => {
         },
         issueLabeled: async () => {
+            let LabelList = issue.labels.map((el) => ({ name: el.name }));
             const response = await notion.databases.query({
                 database_id: database_id,
                 filter: {
@@ -66,12 +67,7 @@ const Notion = (api_key, database_id, issue) => {
                 properties: {
                     //@ts-ignore
                     labels: {
-                        multi_select: [
-                            //@ts-ignore
-                            {
-                                name: 'label',
-                            },
-                        ]
+                        multi_select: LabelList
                     }
                 }
             });
