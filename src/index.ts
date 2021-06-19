@@ -19,7 +19,7 @@ export const run = async () => {
 }
 
 const main = async (eventType: string, issue: Issue) => {
-	let notion = Notion(notionApiKey, notionDatabase, issue);
+	let notion = await Notion(notionApiKey, notionDatabase, issue);
 	if (eventType.split('.')[0] === 'issues') {
 		switch (eventType) {
 			case Issues().opened():
