@@ -5,6 +5,9 @@ branding:
   color: gray-dark
   icon: disc
 inputs:
+  GITHUB_TOKEN:
+    description: 'your GitHub token'
+    required: true
   NOTION_API_KEY:
     description: 'Your notion API Key'
     requried: true
