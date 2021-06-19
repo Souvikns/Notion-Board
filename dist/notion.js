@@ -25,9 +25,16 @@ const Notion = (api_key, database_id, issue) => {
                     //@ts-ignore
                     'URL': {
                         url: issue.html_url
+                    },
+                    //@ts-ignore
+                    id: {
+                        number: issue.id
                     }
                 }
             });
+            if (response) {
+                console.log("✔ Page created");
+            }
         },
         issueEdited: async () => {
         },
@@ -36,6 +43,33 @@ const Notion = (api_key, database_id, issue) => {
         issueDeleted: async () => {
         },
         issueRepoened: async () => {
+        },
+        issueLabeled: async () => {
+            const response = await notion.databases.query({
+                database_id: database_id,
+                filter: {
+                    property: 'id',
+                    number: {
+                        equals: issue.id
+                    }
+                }
+            });
+            let pageID = response.results[0].id;
+            notion.pages.update({
+                page_id: pageID,
+                properties: {
+                    //@ts-ignore
+                    lables: {
+                        multi_select: [
+                            {
+                                id: 'sd',
+                                name: 'label',
+                                color: 'orange'
+                            }
+                        ]
+                    }
+                }
+            });
         }
     };
 };

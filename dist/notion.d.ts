@@ -5,4 +5,5 @@ export declare const Notion: (api_key: string, database_id: string, issue: Issue
     issueClosed: () => Promise<void>;
     issueDeleted: () => Promise<void>;
     issueRepoened: () => Promise<void>;
+    issueLabeled: () => Promise<void>;
 };
