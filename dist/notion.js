@@ -61,11 +61,10 @@ const Notion = (api_key, database_id, issue) => {
                     //@ts-ignore
                     labels: {
                         multi_select: [
+                            //@ts-ignore
                             {
-                                id: 'sd',
                                 name: 'label',
-                                color: 'orange'
-                            }
+                            },
                         ]
                     }
                 }

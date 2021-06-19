@@ -31,7 +31,7 @@ export const Notion = (api_key: string, database_id: string, issue: Issue) => {
 					}
 				}
 			});
-			if(response){
+			if (response) {
 				console.log("✔ Page created");
 			}
 		},
@@ -64,11 +64,10 @@ export const Notion = (api_key: string, database_id: string, issue: Issue) => {
 					//@ts-ignore
 					labels: {
 						multi_select: [
+							//@ts-ignore
 							{
-								id: 'sd',
 								name: 'label',
-								color: 'orange'
-							}
+							},
 						]
 					}
 				}
