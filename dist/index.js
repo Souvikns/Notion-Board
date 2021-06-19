@@ -4942,7 +4942,7 @@ const Notion = (api_key, database_id, issue) => {
                 page_id: pageID,
                 properties: {
                     //@ts-ignore
-                    lables: {
+                    labels: {
                         multi_select: [
                             {
                                 id: 'sd',

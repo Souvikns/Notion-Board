@@ -62,7 +62,7 @@ export const Notion = (api_key: string, database_id: string, issue: Issue) => {
 				page_id: pageID,
 				properties: {
 					//@ts-ignore
-					lables: {
+					labels: {
 						multi_select: [
 							{
 								id: 'sd',
