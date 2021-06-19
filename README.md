@@ -1,6 +1,6 @@
 <h1 align="center">
 
-<img src="./iterative.png" alt="logo" width="150" />
+<img src="./screenshots/iterative.png" alt="logo" width="150" />
 
 <br>
 <br>
@@ -45,3 +45,6 @@ jobs:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE: ${{ secrets.NOTION_DATABASE }}
 ```
+
+## Instructions 
+![board](./screenshots/notion-board.PNG)
