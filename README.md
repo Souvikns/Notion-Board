@@ -9,6 +9,11 @@ Notion Board
 
 </h1>
 
+## Table of contents
+- [Introduction](#introduction)
+- [Inputs](#inputs)
+- [Usage](#usage)
+
 ## Introduction 
 This action lets you sync your GitHub issue with your notion board. Currently it syncs issue state and labels. 
 
