@@ -4912,6 +4912,12 @@ const Notion = (api_key, database_id, issue) => {
                     //@ts-ignore
                     id: {
                         number: issue.id
+                    },
+                    state: {
+                        //@ts-ignore
+                        select: {
+                            name: issue.state
+                        }
                     }
                 }
             });
