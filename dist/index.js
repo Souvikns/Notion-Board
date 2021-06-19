@@ -4904,6 +4904,10 @@ const Notion = (api_key, database_id, issue) => {
                                 },
                             }
                         ]
+                    },
+                    //@ts-ignore
+                    'Issue URL': {
+                        url: issue.html_url
                     }
                 }
             });
@@ -4982,13 +4986,9 @@ const run = async () => {
     if (!notionDatabase)
         throw new Error("Notion Database ID missing");
     const action = github.context.payload.action;
-    console.log("EVENT NAME", process.env.GITHUB_EVENT_NAME);
-    console.log("ACTION", action);
     if (!eventName || !action)
         throw new Error("Event Name or action missing");
     await main(util_1.eventType(eventName, action), util_1.getIssue(github.context.payload.issue));
-    console.log(typeof notionApiKey);
-    console.log(typeof notionDatabase);
 };
 exports.run = run;
 const main = async (eventType, issue) => {

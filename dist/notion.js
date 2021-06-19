@@ -21,6 +21,10 @@ const Notion = (api_key, database_id, issue) => {
                                 },
                             }
                         ]
+                    },
+                    //@ts-ignore
+                    'Issue URL': {
+                        url: issue.html_url
                     }
                 }
             });
