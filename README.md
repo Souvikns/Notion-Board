@@ -10,7 +10,9 @@ Notion Board
 </h1>
 
 ## Introduction 
-This action lets you sync your GitHub issue with your notion board. 
+This action lets you sync your GitHub issue with your notion board. Currently it syncs issue state and labels. 
+
+> More feature on the way.
 
 ## Inputs
 
