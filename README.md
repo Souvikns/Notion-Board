@@ -13,6 +13,7 @@ Notion Board
 - [Introduction](#introduction)
 - [Inputs](#inputs)
 - [Usage](#usage)
+- [Screenshot](#screenshot)
 
 ## Introduction 
 This action lets you sync your GitHub issue with your notion board. Currently it syncs issue state and labels. 
@@ -46,5 +47,5 @@ jobs:
           NOTION_DATABASE: ${{ secrets.NOTION_DATABASE }}
 ```
 
-## Instructions 
+## Screenshot
 ![board](./screenshots/notion-board.PNG)
