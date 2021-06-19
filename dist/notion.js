@@ -70,6 +70,8 @@ const Notion = (api_key, database_id, issue) => {
                     }
                 }
             });
+        },
+        issueUnlabeled: async () => {
         }
     };
 };

@@ -4953,6 +4953,8 @@ const Notion = (api_key, database_id, issue) => {
                     }
                 }
             });
+        },
+        issueUnlabeled: async () => {
         }
     };
 };
@@ -5038,6 +5040,10 @@ const main = async (eventType, issue) => {
             return await notion.issueDeleted();
         case models_1.Issues().reopened():
             return await notion.issueRepoened();
+        case models_1.Issues().labeled():
+            return await notion.issueLabeled();
+        case models_1.Issues().unlabeled():
+            return await notion.issueUnlabeled();
         default:
             console.log("Something happend that I am not accountable for");
     }
@@ -14881,7 +14887,9 @@ const Issues = () => {
         edited: () => `${event}.edited`,
         deleted: () => `${event}.deleted`,
         closed: () => `${event}.closed`,
-        reopened: () => `${event}.reopened`
+        reopened: () => `${event}.reopened`,
+        labeled: () => `${event}.labeled`,
+        unlabeled: () => `${event}.unlabeled`
     };
 };
 exports.Issues = Issues;

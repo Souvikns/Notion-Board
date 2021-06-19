@@ -6,7 +6,9 @@ export const Issues = () => {
 		edited: () => `${event}.edited`,
 		deleted: () => `${event}.deleted`,
 		closed: () => `${event}.closed`,
-		reopened: () => `${event}.reopened`
+		reopened: () => `${event}.reopened`,
+		labeled: () => `${event}.labeled`,
+		unlabeled: () => `${event}.unlabeled`
 	}
 }
 

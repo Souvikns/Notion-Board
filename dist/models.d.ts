@@ -4,6 +4,8 @@ export declare const Issues: () => {
     deleted: () => string;
     closed: () => string;
     reopened: () => string;
+    labeled: () => string;
+    unlabeled: () => string;
 };
 export interface Issue {
     id: number;

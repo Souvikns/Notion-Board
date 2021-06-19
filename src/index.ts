@@ -31,6 +31,10 @@ const main = async (eventType: string, issue: Issue) => {
 			return await notion.issueDeleted();
 		case Issues().reopened():
 			return await notion.issueRepoened();
+		case Issues().labeled():
+			return await notion.issueLabeled();
+		case Issues().unlabeled():
+			return await notion.issueUnlabeled();
 		default:
 			console.log("Something happend that I am not accountable for");
 	}

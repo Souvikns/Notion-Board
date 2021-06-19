@@ -73,6 +73,9 @@ export const Notion = (api_key: string, database_id: string, issue: Issue) => {
 					}
 				}
 			})
+		},
+		issueUnlabeled: async () => {
+
 		}
 	}
 }
