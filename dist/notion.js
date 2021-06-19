@@ -6,9 +6,6 @@ const notionApi = async (apiKey, database_id) => {
     let notion = await new client_1.Client({ auth: apiKey });
     return {
         create: async (name, url, id, state) => {
-            let stateColor = 'green';
-            if (state === 'closed')
-                stateColor = 'red';
             try {
                 let response = await notion.pages.create({
                     parent: {
@@ -30,10 +27,10 @@ const notionApi = async (apiKey, database_id) => {
                             number: id
                         },
                         state: {
+                            //@ts-ignore
                             select: {
                                 name: state,
-                                //@ts-ignore
-                                color: stateColor
+                                color: (state === 'open') ? 'green' : 'red'
                             }
                         }
                     }
@@ -101,9 +98,6 @@ const notionApi = async (apiKey, database_id) => {
                 return "✔ labels updated";
         },
         updateState: async (state, id) => {
-            let stateColor = 'green';
-            if (state === 'closed')
-                stateColor = 'red';
             try {
                 const response = await notion.databases.query({
                     database_id: database_id,
@@ -120,10 +114,10 @@ const notionApi = async (apiKey, database_id) => {
                     properties: {
                         //@ts-ignore
                         state: {
+                            //@ts-ignore
                             select: {
                                 name: state,
-                                //@ts-ignore
-                                color: stateColor
+                                color: (state === 'open') ? 'green' : 'red'
                             }
                         }
                     }
