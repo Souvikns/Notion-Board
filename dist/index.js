@@ -4906,7 +4906,7 @@ const Notion = (api_key, database_id, issue) => {
                         ]
                     },
                     //@ts-ignore
-                    'Issue URL': {
+                    'URL': {
                         url: issue.html_url
                     }
                 }

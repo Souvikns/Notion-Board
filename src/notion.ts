@@ -22,7 +22,7 @@ export const Notion = (api_key: string, database_id: string, issue: Issue) => {
 						]
 					},
 					//@ts-ignore
-					'Issue URL': {
+					'URL': {
 						url: issue.html_url
 					}
 				}
