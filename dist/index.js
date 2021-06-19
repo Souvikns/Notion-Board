@@ -4956,6 +4956,66 @@ const notionApi = async (apiKey, database_id) => {
             catch (error) {
                 throw error;
             }
+        },
+        updateName: async (name, id) => {
+            const response = await notion.databases.query({
+                database_id: database_id,
+                filter: {
+                    property: 'id',
+                    number: {
+                        equals: id
+                    }
+                }
+            });
+            let pageID = response.results[0].id;
+            let res = await notion.pages.update({
+                page_id: pageID,
+                properties: {
+                    //@ts-ignore
+                    Name: {
+                        title: [
+                            { text: { content: name }, type: 'text' }
+                        ]
+                    }
+                }
+            });
+            if (res)
+                return "✔ labels updated";
+        },
+        updateState: async (state, id) => {
+            let stateColor = 'green';
+            if (state === 'closed')
+                stateColor = 'red';
+            try {
+                const response = await notion.databases.query({
+                    database_id: database_id,
+                    filter: {
+                        property: 'id',
+                        number: {
+                            equals: id
+                        }
+                    }
+                });
+                let pageID = response.results[0].id;
+                let res = await notion.pages.update({
+                    page_id: pageID,
+                    properties: {
+                        //@ts-ignore
+                        state: {
+                            select: {
+                                name: state,
+                                //@ts-ignore
+                                color: stateColor
+                            }
+                        }
+                    }
+                });
+                if (res)
+                    return "✔ state updated";
+            }
+            catch (error) {
+                throw error;
+            }
         }
     };
 };
@@ -4973,12 +5033,28 @@ const Notion = async (api_key, database_id, issue) => {
             }
         },
         issueEdited: async () => {
+            try {
+                let res = notion.updateName(issue.title, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
         },
         issueClosed: async () => {
+            try {
+                let res = await notion.updateState(issue.state, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
         },
         issueDeleted: async () => {
         },
         issueRepoened: async () => {
+            let res = await notion.updateState(issue.state, issue.id);
+            console.log(res);
         },
         issueLabeled: async () => {
             try {
@@ -4990,6 +5066,13 @@ const Notion = async (api_key, database_id, issue) => {
             }
         },
         issueUnlabeled: async () => {
+            try {
+                let res = await notion.updateLabel(issue.labels, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
         }
     };
 };
