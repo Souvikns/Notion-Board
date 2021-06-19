@@ -43,6 +43,7 @@ const notionApi = async (apiKey: string, database_id: string) => {
 			}
 		},
 		updateLabel: async (labels: any, id: number) => {
+			console.log(labels, id);
 			try {
 				let LabelList = labels.map((el: any) => ({ name: el.name }));
 				const response = await notion.databases.query({
