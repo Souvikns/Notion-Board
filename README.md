@@ -47,5 +47,11 @@ jobs:
           NOTION_DATABASE: ${{ secrets.NOTION_DATABASE }}
 ```
 
+As of now notion API does not allow creating or changing properties, so right now you have to add these properties manually to use this action. 
+- URL - type: `URL`
+- id - type: `Number`
+- state - type: `Select`
+- labels - type: `Mutli-Select`
+
 ## Screenshot
 ![board](./screenshots/notion-board.PNG)
