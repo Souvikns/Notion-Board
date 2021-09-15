@@ -146,6 +146,8 @@ export const Notion = async (api_key: string, database_id: string, issue: Issue)
 			try {
 				let res = await notion.createPage(issue.title, issue.html_url, issue.id, issue.state, issue.body);
 				console.log(res);
+				res = await notion.updateLabel(issue.labels, issue.id);
+				console.log(res);
 			} catch (error) {
 				throw error
 			}
