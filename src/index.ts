@@ -31,7 +31,7 @@ const main = async (eventType: string, issue: Issue) => {
 			case Issues().deleted():
 				return await notion.issueDeleted();
 			case Issues().reopened():
-				return await notion.issueRepoened();
+				return await notion.issueReopened();
 			case Issues().labeled():
 				return await notion.issueLabeled();
 			case Issues().unlabeled():

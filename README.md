@@ -16,7 +16,7 @@ Notion Board
 - [Screenshot](#screenshot)
 
 ## Introduction 
-This action lets you sync your GitHub issue with your notion board. Currently it syncs issue state and labels. 
+This action lets you sync your GitHub issue with your notion board. Currently it syncs issue title, body, state and labels. 
 
 > More features on the way.
 
