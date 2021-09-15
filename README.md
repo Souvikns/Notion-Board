@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Notion Board
-        uses: Souvikns/Notion-Board@v1.0.0
+        uses: Souvikns/Notion-Board@1.0.0
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
