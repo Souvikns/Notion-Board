@@ -1,9 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIssue = exports.eventType = void 0;
-const eventType = (event, action) => `${event}.${action}`;
-exports.eventType = eventType;
-const getIssue = (issue) => {
+exports.eventType = (event, action) => `${event}.${action}`;
+exports.getIssue = (issue) => {
     return {
         id: issue.id,
         state: issue.state,
@@ -14,5 +12,4 @@ const getIssue = (issue) => {
         labels: issue.labels
     };
 };
-exports.getIssue = getIssue;
 //# sourceMappingURL=util.js.map

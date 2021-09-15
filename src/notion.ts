@@ -28,8 +28,7 @@ const notionApi = async (apiKey: string, database_id: string) => {
 						state: {
 							//@ts-ignore
 							select: {
-								name: state,
-								color: (state === 'open')? 'green':'red'
+								name: state
 							}
 						}
 					}
@@ -114,8 +113,7 @@ const notionApi = async (apiKey: string, database_id: string) => {
 						state: {
 							//@ts-ignore
 							select: {
-								name: state,
-								color: (state === 'open')? 'green':'red'
+								name: state
 							}
 						}
 					}
