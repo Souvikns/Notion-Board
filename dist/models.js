@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Issues = void 0;
-const Issues = () => {
+exports.Issues = () => {
     const event = "issues";
     return {
         opened: () => `${event}.opened`,
@@ -13,5 +12,4 @@ const Issues = () => {
         unlabeled: () => `${event}.unlabeled`
     };
 };
-exports.Issues = Issues;
 //# sourceMappingURL=models.js.map

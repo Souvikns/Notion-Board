@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Notion = void 0;
 const client_1 = require("@notionhq/client");
 const notionApi = async (apiKey, database_id) => {
     let notion = await new client_1.Client({ auth: apiKey });
@@ -29,8 +28,7 @@ const notionApi = async (apiKey, database_id) => {
                         state: {
                             //@ts-ignore
                             select: {
-                                name: state,
-                                color: (state === 'open') ? 'green' : 'red'
+                                name: state
                             }
                         }
                     }
@@ -116,8 +114,7 @@ const notionApi = async (apiKey, database_id) => {
                         state: {
                             //@ts-ignore
                             select: {
-                                name: state,
-                                color: (state === 'open') ? 'green' : 'red'
+                                name: state
                             }
                         }
                     }
@@ -131,7 +128,7 @@ const notionApi = async (apiKey, database_id) => {
         }
     };
 };
-const Notion = async (api_key, database_id, issue) => {
+exports.Notion = async (api_key, database_id, issue) => {
     const notion = await notionApi(api_key, database_id);
     return {
         issueCreated: async () => {
@@ -188,5 +185,4 @@ const Notion = async (api_key, database_id, issue) => {
         }
     };
 };
-exports.Notion = Notion;
 //# sourceMappingURL=notion.js.map
