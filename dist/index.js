@@ -4168,7 +4168,7 @@ const notionApi = async (apiKey, database_id) => {
                         },
                         body: {
                             rich_text: [
-                                { text: { content: body }, type: 'text' }
+                                { text: { content: (body != undefined) ? body : '' }, type: 'text' }
                             ],
                             type: 'rich_text'
                         }
@@ -4233,7 +4233,7 @@ const notionApi = async (apiKey, database_id) => {
                     },
                     body: {
                         rich_text: [
-                            { text: { content: body }, type: 'text' }
+                            { text: { content: (body != undefined) ? body : '' }, type: 'text' }
                         ],
                         type: 'rich_text'
                     }
