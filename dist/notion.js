@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Notion = void 0;
 const client_1 = require("@notionhq/client");
 const notionApi = async (apiKey, database_id) => {
     let notion = await new client_1.Client({ auth: apiKey });
@@ -140,7 +141,7 @@ const notionApi = async (apiKey, database_id) => {
         }
     };
 };
-exports.Notion = async (api_key, database_id, issue) => {
+const Notion = async (api_key, database_id, issue) => {
     const notion = await notionApi(api_key, database_id);
     return {
         issueCreated: async () => {
@@ -199,4 +200,5 @@ exports.Notion = async (api_key, database_id, issue) => {
         }
     };
 };
+exports.Notion = Notion;
 //# sourceMappingURL=notion.js.map
