@@ -4,7 +4,7 @@ const client_1 = require("@notionhq/client");
 const notionApi = async (apiKey, database_id) => {
     let notion = await new client_1.Client({ auth: apiKey });
     return {
-        create: async (name, url, id, state) => {
+        createPage: async (name, url, id, state, body) => {
             try {
                 let response = await notion.pages.create({
                     parent: {
@@ -30,6 +30,12 @@ const notionApi = async (apiKey, database_id) => {
                             select: {
                                 name: state
                             }
+                        },
+                        body: {
+                            rich_text: [
+                                { text: { content: body }, type: 'text' }
+                            ],
+                            type: 'rich_text'
                         }
                     }
                 });
@@ -70,7 +76,7 @@ const notionApi = async (apiKey, database_id) => {
                 throw error;
             }
         },
-        updateName: async (name, id) => {
+        updatePage: async (name, id, body) => {
             const response = await notion.databases.query({
                 database_id: database_id,
                 filter: {
@@ -89,11 +95,17 @@ const notionApi = async (apiKey, database_id) => {
                         title: [
                             { text: { content: name }, type: 'text' }
                         ]
+                    },
+                    body: {
+                        rich_text: [
+                            { text: { content: body }, type: 'text' }
+                        ],
+                        type: 'rich_text'
                     }
                 }
             });
             if (res)
-                return "✔ labels updated";
+                return "✔ page updated";
         },
         updateState: async (state, id) => {
             try {
@@ -134,7 +146,7 @@ exports.Notion = async (api_key, database_id, issue) => {
         issueCreated: async () => {
             //TODO: Create a page in notion 
             try {
-                let res = await notion.create(issue.title, issue.html_url, issue.id, issue.state);
+                let res = await notion.createPage(issue.title, issue.html_url, issue.id, issue.state, issue.body);
                 console.log(res);
             }
             catch (error) {
@@ -143,7 +155,7 @@ exports.Notion = async (api_key, database_id, issue) => {
         },
         issueEdited: async () => {
             try {
-                let res = notion.updateName(issue.title, issue.id);
+                let res = notion.updatePage(issue.title, issue.id, issue.body);
                 console.log(res);
             }
             catch (error) {
@@ -161,7 +173,7 @@ exports.Notion = async (api_key, database_id, issue) => {
         },
         issueDeleted: async () => {
         },
-        issueRepoened: async () => {
+        issueReopened: async () => {
             let res = await notion.updateState(issue.state, issue.id);
             console.log(res);
         },

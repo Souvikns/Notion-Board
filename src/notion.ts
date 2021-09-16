@@ -4,7 +4,7 @@ import { Issue } from './models';
 const notionApi = async (apiKey: string, database_id: string) => {
 	let notion = await new Client({ auth: apiKey });
 	return {
-		create: async (name: string, url: string, id: number, state: string) => {
+		createPage: async (name: string, url: string, id: number, state: string, body: string) => {
 			try {
 				let response = await notion.pages.create({
 					parent: {
@@ -30,6 +30,12 @@ const notionApi = async (apiKey: string, database_id: string) => {
 							select: {
 								name: state
 							}
+						},
+						body: {
+							rich_text: [
+								{ text: { content: body }, type: 'text' }
+							],
+							type: 'rich_text'
 						}
 					}
 				})
@@ -68,7 +74,7 @@ const notionApi = async (apiKey: string, database_id: string) => {
 			}
 
 		},
-		updateName: async (name: string, id: number) => {
+		updatePage: async (name: string, id: number, body: string) => {
 			const response = await notion.databases.query({
 				database_id: database_id,
 				filter: {
@@ -88,10 +94,16 @@ const notionApi = async (apiKey: string, database_id: string) => {
 						title: [
 							{ text: { content: name }, type: 'text' }
 						]
+					},
+					body: {
+						rich_text: [
+							{ text: { content: body }, type: 'text' }
+						],
+						type: 'rich_text'
 					}
 				}
 			});
-			if (res) return "✔ labels updated"
+			if (res) return "✔ page updated"
 		},
 		updateState: async (state: string, id: number) => {
 			try {
@@ -132,7 +144,7 @@ export const Notion = async (api_key: string, database_id: string, issue: Issue)
 		issueCreated: async () => {
 			//TODO: Create a page in notion 
 			try {
-				let res = await notion.create(issue.title, issue.html_url, issue.id, issue.state);
+				let res = await notion.createPage(issue.title, issue.html_url, issue.id, issue.state, issue.body);
 				console.log(res);
 			} catch (error) {
 				throw error
@@ -140,7 +152,7 @@ export const Notion = async (api_key: string, database_id: string, issue: Issue)
 		},
 		issueEdited: async () => {
 			try {
-				let res = notion.updateName(issue.title, issue.id);
+				let res = notion.updatePage(issue.title, issue.id, issue.body);
 				console.log(res);
 			} catch (error) {
 				throw error;
@@ -157,7 +169,7 @@ export const Notion = async (api_key: string, database_id: string, issue: Issue)
 		issueDeleted: async () => {
 
 		},
-		issueRepoened: async () => {
+		issueReopened: async () => {
 			let res = await notion.updateState(issue.state, issue.id);
 			console.log(res);
 		},
