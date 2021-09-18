@@ -248,7 +248,7 @@ class App {
             state,
             id,
             url: html_url,
-            body
+            body: body || ''
         });
         console.log('✅ Issue successfully Synced');
     }
