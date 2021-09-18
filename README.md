@@ -13,6 +13,7 @@ Notion Board
 - [Introduction](#introduction)
 - [Inputs](#inputs)
 - [Usage](#usage)
+- [Set up Notion Board](#set-up-notion-board)
 - [Screenshot](#screenshot)
 
 ## Introduction 
@@ -51,7 +52,19 @@ Start with [setting up an integration and sharing your Notion database](https://
 
 After setting up your workflow, add your `NOTION_API_KEY` and `NOTION_DATABASE` secrets to your repository.
 
-With the update of [Notion_API](https://developers.notion.com/reference/intro) now you don't have to add **database propoerties**. Head over to your actions tab and run this github action which will setup your notion database. 
+> 🚩🚩 With the update of [Notion_API](https://developers.notion.com/reference/intro) now you don't have to add **database propoerties**. 
+
+## Set up Notion Board
+
+Now **Notion Board** uses `workflow_dispatch` to automatically setup your Notion Database creating all the necessary database properties. 
+
+<details>
+<summary>🚀 <b>Manually trigger the action to complete setup</b>.</summary>
+<br>
+<img src="./screenshots/workflow_dispatch.PNG" width="400" />
+</details>
+
+
 
 
 ## Screenshot
