@@ -2,9 +2,12 @@ name: Notion Board
 on:
   issues:
   issue_comment:
-  repository_dispatch:
-    types: [setup]
   workflow_dispatch:
+    inputs:
+      setup:
+        description: 'Setup Notion Board'
+        required: true
+        default: 'true'
 jobs:
   build:
     runs-on: ubuntu-latest
