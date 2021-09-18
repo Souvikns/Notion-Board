@@ -14,8 +14,9 @@ export const run = async () => {
 	if (!notionApiKey) throw new Error("Notion API Key missing");
 	if (!notionDatabase) throw new Error("Notion Database ID missing");
 	const action = github.context.payload.action;
-	console.log(core.getInput('setup') || process.env.setup)
-	console.log(eventName, action);
+	if (eventName === 'workflow_dispatch') {
+		return console.log('✔ Setting up...');
+	}
 	if (!eventName || !action) throw new Error("Event Name or action missing");
 	await main(eventType(eventName, action), getIssue(github.context.payload.issue));
 }
