@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Notion Board
-        uses: Souvikns/Notion-Board@1.0.0
+        uses: Souvikns/Notion-Board@latest
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
@@ -51,11 +51,8 @@ Start with [setting up an integration and sharing your Notion database](https://
 
 After setting up your workflow, add your `NOTION_API_KEY` and `NOTION_DATABASE` secrets to your repository.
 
-As of right now notion API does not allow creating or changing properties, meaning you have to **add these properties manually** to your database in order to use this action. 
-- URL - type: `URL`
-- id - type: `Number`
-- state - type: `Select`
-- labels - type: `Multi-Select`
+With the update of [Notion_API](https://developers.notion.com/reference/intro) now you don't have to add **database propoerties**. Head over to your actions tab and run this github action which will setup your notion database. 
+
 
 ## Screenshot
 ![board](./screenshots/notion-board.PNG)
