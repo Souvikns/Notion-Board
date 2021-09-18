@@ -9,7 +9,7 @@ module.exports = JSON.parse('{"name":"@notionhq/client","version":"0.3.2","descr
 
 /***/ }),
 
-/***/ 3381:
+/***/ 8217:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -201,13 +201,14 @@ exports.NotionAdapter = NotionAdapter;
 
 /***/ }),
 
-/***/ 4286:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 9665:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.App = void 0;
+const models_1 = __nccwpck_require__(4849);
 class App {
     notion;
     constructor(notion) {
@@ -220,13 +221,56 @@ class App {
             error: error
         };
     }
+    async IssueActionHandler(eventType, issue) {
+        if (eventType.split('.')[0] === 'issues') {
+            switch (eventType) {
+                case (0, models_1.Issues)().opened():
+                    return await this.issueOpened(issue);
+                case (0, models_1.Issues)().closed():
+                    return await this.issueClosed(issue);
+                case (0, models_1.Issues)().edited():
+                    return await this.issueEdited(issue);
+                case (0, models_1.Issues)().reopened():
+                    return await this.issueClosed(issue);
+                case (0, models_1.Issues)().labeled():
+                    return await this.issueLabelUpdated(issue);
+                case (0, models_1.Issues)().unlabeled():
+                    return this.issueLabelUpdated(issue);
+                default:
+                    return console.log('🚩 Something happend that I am not accountable for.');
+            }
+        }
+    }
+    async issueOpened(issue) {
+        const { title, state, id, html_url, body } = issue;
+        await this.notion.createPage({
+            title,
+            state,
+            id,
+            url: html_url,
+            body
+        });
+        console.log('✅ Issue successfully Synced');
+    }
+    async issueClosed(issue) {
+        await this.notion.updateState(issue.state, issue.id);
+        console.log('✅ Issue state successfully updated');
+    }
+    async issueEdited(issue) {
+        await this.notion.updatePage(issue.id, issue.title, issue.body);
+        console.log('✅ Issue successfully synced');
+    }
+    async issueLabelUpdated(issue) {
+        await this.notion.updateLabel(issue.id, issue.labels);
+        console.log('✅ Labels synced');
+    }
 }
 exports.App = App;
 //# sourceMappingURL=app.js.map
 
 /***/ }),
 
-/***/ 9283:
+/***/ 1667:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -254,22 +298,22 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const util_1 = __nccwpck_require__(1251);
-const models_1 = __nccwpck_require__(6251);
-const notion_1 = __nccwpck_require__(3713);
-const adapter_1 = __nccwpck_require__(3381);
-const app_1 = __nccwpck_require__(4286);
+const util_1 = __nccwpck_require__(9731);
+const models_1 = __nccwpck_require__(4849);
+const notion_1 = __nccwpck_require__(9093);
+const adapter_1 = __nccwpck_require__(8217);
+const app_1 = __nccwpck_require__(9665);
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
 const notionApiKey = process.env.NOTION_API_KEY || core.getInput('NOTION_API_KEY');
 const notionDatabase = process.env.NOTION_DATABASE || core.getInput('NOTION_DATABASE');
 const run = async () => {
     if (!token)
-        throw new Error("Github token not found");
+        throw new Error("⛔ Github token not found");
     if (!notionApiKey)
-        throw new Error("Notion API Key missing");
+        throw new Error("⛔ Notion API Key missing");
     if (!notionDatabase)
-        throw new Error("Notion Database ID missing");
+        throw new Error("⛔ Notion Database ID missing");
     const app = new app_1.App(new adapter_1.NotionAdapter(notionApiKey, notionDatabase));
     const action = github.context.payload.action;
     if (eventName === 'workflow_dispatch') {
@@ -280,8 +324,8 @@ const run = async () => {
         return;
     }
     if (!eventName || !action)
-        throw new Error("Event Name or action missing");
-    await main((0, util_1.eventType)(eventName, action), (0, util_1.getIssue)(github.context.payload.issue));
+        throw new Error("⛔ Event Name or action missing");
+    await app.IssueActionHandler((0, util_1.eventType)(eventName, action), (0, util_1.getIssue)(github.context.payload));
 };
 exports.run = run;
 const main = async (eventType, issue) => {
@@ -317,7 +361,7 @@ const main = async (eventType, issue) => {
 
 /***/ }),
 
-/***/ 6251:
+/***/ 4849:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -341,7 +385,7 @@ exports.Issues = Issues;
 
 /***/ }),
 
-/***/ 3713:
+/***/ 9093:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -553,7 +597,7 @@ exports.Notion = Notion;
 
 /***/ }),
 
-/***/ 1251:
+/***/ 9731:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -10894,7 +10938,7 @@ module.exports = require("zlib");
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(9283);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(1667);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

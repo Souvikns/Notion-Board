@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "package": "ncc build -o dist"
+    "package": "ncc build ./build -o dist"
   },
   "repository": {
     "type": "git",
