@@ -36,19 +36,13 @@ export class App {
   }
 
   private async issueOpened(issue: Issue) {
-    const {
-      title,
-      state,
-      id,
-      html_url,
-      body
-    } = issue;
+    console.log(issue);
     await this.notion.createPage({
-      title,
-      state,
-      id,
-      url: html_url,
-      body: body || ''
+      title: issue.title,
+      id: issue.id,
+      state: issue.state,
+      url: issue.html_url,
+      body: issue.body || ''
     })
     console.log('✅ Issue successfully Synced');
   }
