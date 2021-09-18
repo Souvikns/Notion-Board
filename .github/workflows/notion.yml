@@ -2,6 +2,9 @@ name: Notion Board
 on:
   issues:
   issue_comment:
+  repository_dispatch:
+    types: [setup]
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest

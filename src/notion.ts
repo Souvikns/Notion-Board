@@ -25,6 +25,7 @@ const notionApi = async (apiKey: string, database_id: string) => {
 						id: {
 							number: id
 						},
+						//@ts-ignore
 						state: {
 							//@ts-ignore
 							select: {
