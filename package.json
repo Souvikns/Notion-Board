@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "package": "ncc build --source-map"
+    "package": "ncc build -o dist"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
   "homepage": "https://github.com/Souvikns/Notion-Board#readme",
   "devDependencies": {
     "@types/jest": "^27.0.1",
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.31.1",
     "dotenv": "^10.0.0",
     "jest": "^27.2.0",
     "ts-jest": "^27.0.5",

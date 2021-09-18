@@ -3,6 +3,8 @@ import * as github from '@actions/github';
 import { eventType, getIssue } from './util';
 import { Issue, Issues } from './models';
 import { Notion } from './notion';
+import {NotionAdapter} from './adapter';
+import {App} from './app';
 
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
@@ -13,9 +15,13 @@ export const run = async () => {
 	if (!token) throw new Error("Github token not found");
 	if (!notionApiKey) throw new Error("Notion API Key missing");
 	if (!notionDatabase) throw new Error("Notion Database ID missing");
+	const app = new App(new NotionAdapter(notionApiKey, notionDatabase));
 	const action = github.context.payload.action;
 	if (eventName === 'workflow_dispatch') {
-		return console.log('✔ Setting up...');
+		const {response, error} = await app.initialize();
+		if(error) throw error;
+		console.log(response);
+		return;
 	}
 	if (!eventName || !action) throw new Error("Event Name or action missing");
 	await main(eventType(eventName, action), getIssue(github.context.payload.issue));
