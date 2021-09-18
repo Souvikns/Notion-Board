@@ -24,7 +24,7 @@ export const run = async () => {
 		return;
 	}
 	if (!eventName || !action) throw new Error("⛔ Event Name or action missing");
-	await app.IssueActionHandler(eventType(eventName, action), getIssue(github.context.payload));
+	await app.IssueActionHandler(eventType(eventName, action), getIssue(github.context.payload.issue));
 }
 
 const main = async (eventType: string, issue: Issue) => {
