@@ -2309,7 +2309,7 @@ const run = async () => {
     if (!notionDatabase)
         throw new Error("Notion Database ID missing");
     const action = github.context.payload.action;
-    console.log(core.getInput('setup'));
+    console.log(core.getInput('setup') || process.env.setup);
     console.log(eventName, action);
     if (!eventName || !action)
         throw new Error("Event Name or action missing");
