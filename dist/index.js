@@ -250,6 +250,7 @@ class App {
             url: issue.html_url,
             body: issue.body || ''
         });
+        await this.notion.updateLabel(issue.id, issue.labels);
         console.log('✅ Issue successfully Synced');
     }
     async issueClosed(issue) {
