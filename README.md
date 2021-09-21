@@ -35,6 +35,7 @@ name: Notion Board
 on:
   issues:
   issue_comment:
+  workflow_dispatch:
 jobs:
   notion:
     runs-on: ubuntu-latest
