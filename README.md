@@ -65,7 +65,11 @@ Now **Notion Board** uses `workflow_dispatch` to automatically setup your Notion
 <img src="./screenshots/workflow_dispatch.PNG" width="400" />
 </details>
 
+#### Works best with this notion template 
 
+> This notion template will be updated in the future, so do keep a lookout 
+
+#### [🔽 Download your free notion template now.](https://charm-mackerel-441.notion.site/38b577d3b7054446a69a9b37b192a9e3?v=37c5c53c72a244c380d2526cb66a08f4)
 
 
 ## Screenshot
