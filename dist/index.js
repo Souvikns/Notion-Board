@@ -376,7 +376,8 @@ const run = async () => {
         const issues = await octokit.paginate('GET /repos/{owner}/{repo}/issues', {
             owner,
             repo,
-            per_page: 100
+            per_page: 100,
+            state: 'all',
         }, response => response.data.map(issue => (0, util_1.getIssue)(issue)));
         const { response, error } = await app.initialize(issues);
         if (error)

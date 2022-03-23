@@ -23,7 +23,8 @@ export const run = async () => {
 		const issues = await octokit.paginate('GET /repos/{owner}/{repo}/issues', {
 			owner,
 			repo,
-			per_page: 100
+			per_page: 100,
+			state: 'all',
 		}, response => response.data.map(issue => getIssue(issue)));
 
 		const {response, error} = await app.initialize(issues);
