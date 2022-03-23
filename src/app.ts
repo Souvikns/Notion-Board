@@ -11,6 +11,7 @@ export class App {
 
     for (const ghIssue of githubIssues) {
       const page = await this.notion.isPageAvailable(ghIssue.id);
+      console.log(ghIssue);
       if(!page) {
         const {error} = await this.notion.createPage({
           body: ghIssue.body,
