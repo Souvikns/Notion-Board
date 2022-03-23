@@ -63,6 +63,7 @@ export class NotionAdapter extends NotionClient {
   }
 
   async createPage(input: IPageInput): Promise<{ error?: Error | unknown; }> {
+    const ghLabels = input.lables.map((l: any) => ({name: l.name}))
     try {
       await this.client.pages.create({
         parent: {
@@ -87,6 +88,9 @@ export class NotionAdapter extends NotionClient {
           },
           State: {
             select: { name: input.state }
+          },
+          Label: {
+            multi_select: ghLabels
           }
         }
       });
