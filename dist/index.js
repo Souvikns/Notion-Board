@@ -5,70 +5,332 @@
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@notionhq/client","version":"0.4.9","description":"A simple and easy to use client for the Notion API","engines":{"node":">=12"},"homepage":"https://developers.notion.com/docs/getting-started","bugs":{"url":"https://github.com/makenotion/notion-sdk-js/issues"},"repository":{"type":"git","url":"https://github.com/makenotion/notion-sdk-js/"},"keywords":["notion","notionapi","rest","notion-api"],"main":"./build/src","scripts":{"prepare":"npm run build","prepublishOnly":"npm run checkLoggedIn && npm run lint && npm run test","build":"tsc","prettier":"prettier --write .","lint":"prettier --check . && eslint . --ext .ts && cspell \'**/*\' ","test":"ava","check-links":"git ls-files | grep md$ | xargs -n 1 markdown-link-check","prebuild":"npm run clean","clean":"rm -rf ./build","checkLoggedIn":"./scripts/verifyLoggedIn.sh"},"author":"","license":"MIT","files":["build/package.json","build/src/**"],"dependencies":{"@types/node-fetch":"^2.5.10","node-fetch":"^2.6.1"},"devDependencies":{"@ava/typescript":"^2.0.0","@typescript-eslint/eslint-plugin":"^4.22.0","@typescript-eslint/parser":"^4.22.0","ava":"^3.15.0","cspell":"^5.4.1","eslint":"^7.24.0","markdown-link-check":"^3.8.7","prettier":"^2.3.0","typescript":"^4.2.4"}}');
+module.exports = JSON.parse('{"name":"@notionhq/client","version":"1.0.4","description":"A simple and easy to use client for the Notion API","engines":{"node":">=12"},"homepage":"https://developers.notion.com/docs/getting-started","bugs":{"url":"https://github.com/makenotion/notion-sdk-js/issues"},"repository":{"type":"git","url":"https://github.com/makenotion/notion-sdk-js/"},"keywords":["notion","notionapi","rest","notion-api"],"main":"./build/src","types":"./build/src/index.d.ts","scripts":{"prepare":"npm run build","prepublishOnly":"npm run checkLoggedIn && npm run lint && npm run test","build":"tsc","prettier":"prettier --write .","lint":"prettier --check . && eslint . --ext .ts && cspell \'**/*\' ","test":"ava","check-links":"git ls-files | grep md$ | xargs -n 1 markdown-link-check","prebuild":"npm run clean","clean":"rm -rf ./build","checkLoggedIn":"./scripts/verifyLoggedIn.sh"},"author":"","license":"MIT","files":["build/package.json","build/src/**"],"dependencies":{"@types/node-fetch":"^2.5.10","node-fetch":"^2.6.1"},"devDependencies":{"@ava/typescript":"^2.0.0","@typescript-eslint/eslint-plugin":"^4.22.0","@typescript-eslint/parser":"^4.22.0","ava":"^3.15.0","cspell":"^5.4.1","eslint":"^7.24.0","markdown-link-check":"^3.8.7","prettier":"^2.3.0","typescript":"^4.2.4"}}');
 
 /***/ }),
 
-/***/ 9665:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 8217:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-class ActionHandler {
-    actionEvents = {};
-    register(eventType, cb) {
-        this.actionEvents[eventType] = cb;
+exports.NotionAdapter = void 0;
+const client_1 = __nccwpck_require__(324);
+class NotionClient {
+    client;
+    constructor(apiKey) {
+        this.client = new client_1.Client({ auth: apiKey });
     }
-    async run(eventType, issue) {
-        const cb = this.actionEvents[eventType];
-        if (cb) {
-            await cb(issue);
+}
+class NotionAdapter extends NotionClient {
+    databaseId;
+    ICON_URL = 'https://github.com/Souvikns/Notion-Board/blob/main/screenshots/iterative.png?raw=true';
+    constructor(apiKey, databaseId) {
+        super(apiKey);
+        this.databaseId = databaseId;
+    }
+    async isPageAvailable(ghId) {
+        const pages = await this.client.databases.query({
+            database_id: this.databaseId,
+            filter: {
+                property: 'ID',
+                number: {
+                    equals: ghId
+                }
+            }
+        });
+        const notionPage = pages.results[0];
+        if (notionPage)
+            return notionPage;
+        return undefined;
+    }
+    async updateCompletePage(issue, page_id) {
+        try {
+            let LabelList = issue.labels.map((el) => ({ name: el.name }));
+            await this.client.pages.update({
+                page_id: page_id,
+                properties: {
+                    Name: {
+                        title: [
+                            { text: { content: issue.title }, type: 'text' }
+                        ]
+                    },
+                    URL: {
+                        url: issue.html_url
+                    },
+                    State: {
+                        select: { name: issue.state }
+                    },
+                    ID: {
+                        number: issue.id
+                    },
+                    Label: {
+                        multi_select: LabelList
+                    }
+                }
+            });
+            return {};
+        }
+        catch (error) {
+            return { error };
+        }
+    }
+    async createPage(input) {
+        try {
+            await this.client.pages.create({
+                parent: {
+                    database_id: this.databaseId
+                },
+                icon: {
+                    external: {
+                        url: this.ICON_URL
+                    }
+                },
+                properties: {
+                    Name: {
+                        title: [
+                            { text: { content: input.title }, type: 'text' }
+                        ]
+                    },
+                    URL: {
+                        url: input.url
+                    },
+                    ID: {
+                        number: input.id
+                    },
+                    State: {
+                        select: { name: input.state }
+                    }
+                },
+                children: [
+                    {
+                        object: 'block',
+                        type: 'paragraph',
+                        paragraph: {
+                            text: [
+                                {
+                                    type: 'text',
+                                    text: {
+                                        content: input.body
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                ]
+            });
+            return {};
+        }
+        catch (error) {
+            return { error };
+        }
+    }
+    async updatePage(id, title, body) {
+        try {
+            const pages = await this.client.databases.query({
+                database_id: this.databaseId,
+                filter: {
+                    property: 'ID',
+                    number: {
+                        equals: id
+                    }
+                }
+            });
+            const pageId = pages.results[0].id;
+            await this.client.pages.update({
+                page_id: pageId,
+                properties: {
+                    Name: {
+                        title: [
+                            {
+                                text: {
+                                    content: title,
+                                },
+                                type: 'text'
+                            }
+                        ]
+                    }
+                }
+            });
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async setup() {
+        try {
+            await this.client.databases.update({
+                database_id: this.databaseId,
+                properties: {
+                    URL: {
+                        url: {}
+                    },
+                    ID: {
+                        number: {}
+                    },
+                    State: {
+                        select: {
+                            options: [
+                                { name: 'open', color: 'green' },
+                                { name: 'closed', color: 'red' }
+                            ]
+                        }
+                    },
+                    Label: {
+                        multi_select: {}
+                    }
+                }
+            });
+            return {};
+        }
+        catch (error) {
+            return { error };
+        }
+    }
+    async updateState(state, id) {
+        try {
+            const pages = await this.client.databases.query({
+                database_id: this.databaseId,
+                filter: {
+                    property: 'ID',
+                    number: {
+                        equals: id
+                    }
+                }
+            });
+            const pageId = pages.results[0].id;
+            await this.client.pages.update({
+                page_id: pageId,
+                properties: {
+                    State: {
+                        select: {
+                            name: state
+                        }
+                    }
+                }
+            });
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async updateLabel(id, labels) {
+        try {
+            const labelList = labels.map((el) => ({ name: el.name }));
+            const pages = await this.client.databases.query({
+                database_id: this.databaseId,
+                filter: {
+                    property: 'ID',
+                    number: {
+                        equals: id
+                    }
+                }
+            });
+            const pageId = pages.results[0].id;
+            await this.client.pages.update({
+                page_id: pageId,
+                properties: {
+                    Label: {
+                        multi_select: labelList
+                    }
+                }
+            });
+        }
+        catch (error) {
+            throw error;
         }
     }
 }
-class App extends ActionHandler {
+exports.NotionAdapter = NotionAdapter;
+//# sourceMappingURL=adapter.js.map
+
+/***/ }),
+
+/***/ 9665:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.App = void 0;
+const models_1 = __nccwpck_require__(4849);
+class App {
     notion;
     constructor(notion) {
-        super();
         this.notion = notion;
-        this.init();
     }
-    init() {
-        super.register('issues.opened', async (issue) => {
-            await this.notion.createPage({
-                title: issue.title,
-                id: issue.id,
-                state: issue.state,
-                url: issue.html_url,
-                body: issue.body
-            });
-            await this.notion.updateLabel(issue.id, issue.labels);
-            console.log('Issue successfully Synced');
+    async initialize(githubIssues) {
+        const { error } = await this.notion.setup();
+        for (const ghIssue of githubIssues) {
+            const page = await this.notion.isPageAvailable(ghIssue.id);
+            if (!page) {
+                const { error } = await this.notion.createPage({
+                    body: ghIssue.body,
+                    id: ghIssue.id,
+                    state: ghIssue.state,
+                    title: ghIssue.title,
+                    url: ghIssue.html_url,
+                    lables: ghIssue.labels
+                });
+                console.log(error);
+            }
+            else {
+                const { error } = await this.notion.updateCompletePage(ghIssue, page.id);
+                console.log(error);
+            }
+        }
+        return {
+            response: '✅ Setup Complete!!',
+            error: error
+        };
+    }
+    async IssueActionHandler(eventType, issue) {
+        if (eventType.split('.')[0] === 'issues') {
+            switch (eventType) {
+                case (0, models_1.Issues)().opened():
+                    return await this.issueOpened(issue);
+                case (0, models_1.Issues)().closed():
+                    return await this.issueClosed(issue);
+                case (0, models_1.Issues)().edited():
+                    return await this.issueEdited(issue);
+                case (0, models_1.Issues)().reopened():
+                    return await this.issueClosed(issue);
+                case (0, models_1.Issues)().labeled():
+                    return await this.issueLabelUpdated(issue);
+                case (0, models_1.Issues)().unlabeled():
+                    return this.issueLabelUpdated(issue);
+                default:
+                    return console.log('🚩 Something happend that I am not accountable for.');
+            }
+        }
+    }
+    async issueOpened(issue) {
+        console.log(issue);
+        await this.notion.createPage({
+            title: issue.title,
+            id: issue.id,
+            state: issue.state,
+            url: issue.html_url,
+            body: issue.body || ''
         });
-        super.register('issues.closed', async (issue) => {
-            await this.notion.updateState(issue.id, issue.state);
-            console.log("Issue State successfully Synced");
-        });
-        super.register('issues.labeled', async (issue) => {
-            await this.notion.updateLabel(issue.id, issue.labels);
-            console.log('label synced');
-        });
-        super.register('issues.unlabeled', async (issues) => {
-            await this.notion.updateLabel(issues.id, issues.labels);
-            console.log('label synced');
-        });
-        super.register('issues.reopened', async (issue) => {
-            await this.notion.updateState(issue.id, issue.state);
-            console.log("state synced");
-        });
-        super.register('issues.edited', async (issue) => {
-            await this.notion.updatePage(issue.id, issue.title);
-            console.log('issue synced');
-        });
+        await this.notion.updateLabel(issue.id, issue.labels);
+        console.log('✅ Issue successfully Synced');
+    }
+    async issueClosed(issue) {
+        await this.notion.updateState(issue.state, issue.id);
+        console.log('✅ Issue state successfully updated');
+    }
+    async issueEdited(issue) {
+        await this.notion.updatePage(issue.id, issue.title, issue.body);
+        console.log('✅ Issue successfully synced');
+    }
+    async issueLabelUpdated(issue) {
+        await this.notion.updateLabel(issue.id, issue.labels);
+        console.log('✅ Labels synced');
     }
 }
-exports.default = App;
+exports.App = App;
 //# sourceMappingURL=app.js.map
 
 /***/ }),
@@ -97,49 +359,331 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const app_1 = __importDefault(__nccwpck_require__(9665));
+const util_1 = __nccwpck_require__(9731);
+const models_1 = __nccwpck_require__(4849);
 const notion_1 = __nccwpck_require__(9093);
-const model_1 = __nccwpck_require__(1384);
+const adapter_1 = __nccwpck_require__(8217);
+const app_1 = __nccwpck_require__(9665);
 const token = core.getInput('token') || process.env.GH_PAT || process.env.GITHUB_TOKEN;
+const eventName = process.env.GITHUB_EVENT_NAME;
 const notionApiKey = process.env.NOTION_API_KEY || core.getInput('NOTION_API_KEY');
 const notionDatabase = process.env.NOTION_DATABASE || core.getInput('NOTION_DATABASE');
-async function run() {
+const run = async () => {
     if (!token)
-        throw new Error("Github TOken not found");
+        throw new Error("⛔ Github token not found");
     if (!notionApiKey)
-        throw new Error("Notion api key not found");
+        throw new Error("⛔ Notion API Key missing");
     if (!notionDatabase)
-        throw new Error("Notion database id missing");
+        throw new Error("⛔ Notion Database ID missing");
+    const app = new app_1.App(new adapter_1.NotionAdapter(notionApiKey, notionDatabase));
     const action = github.context.payload.action;
-    const eventName = github.context.eventName;
-    const app = new app_1.default(new notion_1.NotionAdapter(notionApiKey, notionDatabase));
+    if (eventName === 'workflow_dispatch') {
+        const octokit = github.getOctokit(token);
+        const { repo, owner } = github.context.repo;
+        const issues = await octokit.paginate('GET /repos/{owner}/{repo}/issues', {
+            owner,
+            repo,
+            per_page: 100
+        }, response => response.data.map(issue => (0, util_1.getIssue)(issue)));
+        const { response, error } = await app.initialize(issues);
+        if (error)
+            throw error;
+        console.log(response);
+        return;
+    }
     if (!eventName || !action)
-        throw new Error('Event name or action missing');
-    app.run(`${eventName}.${action}`, (0, model_1.getIssue)(github.context.payload.issue));
-}
-run()
-    .then()
-    .catch(e => {
-    console.error("ERROR: ", e);
-    core.setFailed(e.message);
+        throw new Error("⛔ Event Name or action missing");
+    await app.IssueActionHandler((0, util_1.eventType)(eventName, action), (0, util_1.getIssue)(github.context.payload.issue));
+};
+exports.run = run;
+const main = async (eventType, issue) => {
+    let notion = await (0, notion_1.Notion)(notionApiKey, notionDatabase, issue);
+    if (eventType.split('.')[0] === 'issues') {
+        switch (eventType) {
+            case (0, models_1.Issues)().opened():
+                return await notion.issueCreated();
+            case (0, models_1.Issues)().closed():
+                return await notion.issueClosed();
+            case (0, models_1.Issues)().edited():
+                return await notion.issueEdited();
+            case (0, models_1.Issues)().deleted():
+                return await notion.issueDeleted();
+            case (0, models_1.Issues)().reopened():
+                return await notion.issueReopened();
+            case (0, models_1.Issues)().labeled():
+                return await notion.issueLabeled();
+            case (0, models_1.Issues)().unlabeled():
+                return await notion.issueUnlabeled();
+            default:
+                console.log("Something happend that I am not accountable for");
+        }
+    }
+};
+(0, exports.run)()
+    .then(() => { })
+    .catch((err) => {
+    console.log("ERROR", err);
+    core.setFailed(err.message);
 });
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 1384:
+/***/ 4849:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIssue = void 0;
+exports.Issues = void 0;
+const Issues = () => {
+    const event = "issues";
+    return {
+        opened: () => `${event}.opened`,
+        edited: () => `${event}.edited`,
+        deleted: () => `${event}.deleted`,
+        closed: () => `${event}.closed`,
+        reopened: () => `${event}.reopened`,
+        labeled: () => `${event}.labeled`,
+        unlabeled: () => `${event}.unlabeled`
+    };
+};
+exports.Issues = Issues;
+//# sourceMappingURL=models.js.map
+
+/***/ }),
+
+/***/ 9093:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Notion = void 0;
+const client_1 = __nccwpck_require__(324);
+const notionApi = async (apiKey, database_id) => {
+    let notion = await new client_1.Client({ auth: apiKey });
+    return {
+        createPage: async ({ body, id, state, title, url, lables }) => {
+            let LabelList = lables.map((el) => ({ name: el.name }));
+            try {
+                let response = await notion.pages.create({
+                    parent: {
+                        database_id: database_id
+                    },
+                    properties: {
+                        Name: {
+                            title: [
+                                { text: { content: title }, type: 'text' }
+                            ]
+                        },
+                        'URL': {
+                            url: url
+                        },
+                        'ID': {
+                            number: id
+                        },
+                        'State': {
+                            select: {
+                                name: state
+                            }
+                        },
+                        Label: {
+                            multi_select: LabelList
+                        },
+                        body: {
+                            rich_text: [
+                                { text: { content: (body != undefined) ? body : '' }, type: 'text' }
+                            ],
+                            type: 'rich_text'
+                        }
+                    }
+                });
+                if (response)
+                    return "✔ page created";
+            }
+            catch (error) {
+                throw error;
+            }
+        },
+        updateLabel: async (labels, id) => {
+            console.log(labels, id);
+            try {
+                let LabelList = labels.map((el) => ({ name: el.name }));
+                const response = await notion.databases.query({
+                    database_id: database_id,
+                    filter: {
+                        property: 'id',
+                        number: {
+                            equals: id
+                        }
+                    }
+                });
+                let pageID = response.results[0].id;
+                let res = await notion.pages.update({
+                    page_id: pageID,
+                    properties: {
+                        //@ts-ignore
+                        labels: {
+                            multi_select: LabelList
+                        }
+                    }
+                });
+                if (res)
+                    return "✔ labels updated";
+            }
+            catch (error) {
+                throw error;
+            }
+        },
+        updatePage: async (name, id, body) => {
+            const response = await notion.databases.query({
+                database_id: database_id,
+                filter: {
+                    property: 'id',
+                    number: {
+                        equals: id
+                    }
+                }
+            });
+            let pageID = response.results[0].id;
+            let res = await notion.pages.update({
+                page_id: pageID,
+                properties: {
+                    //@ts-ignore
+                    Name: {
+                        title: [
+                            { text: { content: name }, type: 'text' }
+                        ]
+                    },
+                    body: {
+                        rich_text: [
+                            { text: { content: (body != undefined) ? body : '' }, type: 'text' }
+                        ],
+                        type: 'rich_text'
+                    }
+                }
+            });
+            if (res)
+                return "✔ page updated";
+        },
+        updateState: async (state, id) => {
+            try {
+                const response = await notion.databases.query({
+                    database_id: database_id,
+                    filter: {
+                        property: 'id',
+                        number: {
+                            equals: id
+                        }
+                    }
+                });
+                let pageID = response.results[0].id;
+                let res = await notion.pages.update({
+                    page_id: pageID,
+                    properties: {
+                        //@ts-ignore
+                        state: {
+                            //@ts-ignore
+                            select: {
+                                name: state
+                            }
+                        }
+                    }
+                });
+                if (res)
+                    return "✔ state updated";
+            }
+            catch (error) {
+                throw error;
+            }
+        }
+    };
+};
+const Notion = async (api_key, database_id, issue) => {
+    const notion = await notionApi(api_key, database_id);
+    return {
+        issueCreated: async () => {
+            //TODO: Create a page in notion 
+            try {
+                let res = await notion.createPage({
+                    body: issue.body,
+                    id: issue.id,
+                    state: issue.state,
+                    title: issue.title,
+                    url: issue.html_url,
+                    lables: issue.labels
+                });
+                console.log(res);
+                res = await notion.updateLabel(issue.labels, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
+        },
+        issueEdited: async () => {
+            try {
+                let res = notion.updatePage(issue.title, issue.id, issue.body);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
+        },
+        issueClosed: async () => {
+            try {
+                let res = await notion.updateState(issue.state, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
+        },
+        issueDeleted: async () => {
+        },
+        issueReopened: async () => {
+            let res = await notion.updateState(issue.state, issue.id);
+            console.log(res);
+        },
+        issueLabeled: async () => {
+            try {
+                let res = await notion.updateLabel(issue.labels, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
+        },
+        issueUnlabeled: async () => {
+            try {
+                let res = await notion.updateLabel(issue.labels, issue.id);
+                console.log(res);
+            }
+            catch (error) {
+                throw error;
+            }
+        }
+    };
+};
+exports.Notion = Notion;
+//# sourceMappingURL=notion.js.map
+
+/***/ }),
+
+/***/ 9731:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getIssue = exports.eventType = void 0;
+const eventType = (event, action) => `${event}.${action}`;
+exports.eventType = eventType;
 const getIssue = (issue) => {
     return {
         id: issue.id,
@@ -152,121 +696,7 @@ const getIssue = (issue) => {
     };
 };
 exports.getIssue = getIssue;
-//# sourceMappingURL=model.js.map
-
-/***/ }),
-
-/***/ 9093:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.NotionAdapter = void 0;
-const client_1 = __nccwpck_require__(324);
-class NotionCLient {
-    client;
-    constructor(apiKey) {
-        this.client = new client_1.Client({ auth: apiKey });
-    }
-}
-class NotionAdapter extends NotionCLient {
-    databaseId;
-    constructor(apiKey, databaseId) {
-        super(apiKey);
-        this.databaseId = databaseId;
-    }
-    async createPage(input) {
-        await this.client.pages.create({
-            parent: {
-                database_id: this.databaseId
-            },
-            properties: {
-                Name: {
-                    title: [
-                        { text: { content: input.title }, type: 'text' }
-                    ]
-                },
-                URL: {
-                    url: input.url
-                },
-                ID: {
-                    number: input.id
-                },
-                State: {
-                    select: { name: input.state }
-                }
-            }
-        });
-    }
-    async updatePage(id, title) {
-        const pages = await this.client.databases.query({
-            database_id: this.databaseId,
-            filter: {
-                property: 'ID',
-                number: {
-                    equals: id
-                }
-            }
-        });
-        const pageId = pages.results[0].id;
-        await this.client.pages.update({
-            page_id: pageId,
-            properties: {
-                Name: {
-                    title: [
-                        { text: { content: title }, type: 'text' }
-                    ]
-                }
-            }
-        });
-    }
-    async updateState(id, state) {
-        const pages = await this.client.databases.query({
-            database_id: this.databaseId,
-            filter: {
-                property: 'ID',
-                number: {
-                    equals: id
-                }
-            }
-        });
-        const pageId = pages.results[0].id;
-        await this.client.pages.update({
-            page_id: pageId,
-            properties: {
-                state: {
-                    select: {
-                        name: state
-                    }
-                }
-            }
-        });
-    }
-    async updateLabel(id, labels) {
-        const labelList = labels.map((el) => ({ name: el.name }));
-        const pages = await this.client.databases.query({
-            database_id: this.databaseId,
-            filter: {
-                property: 'ID',
-                number: {
-                    equals: id
-                }
-            }
-        });
-        const pageId = pages.results[0].id;
-        await this.client.pages.update({
-            page_id: pageId,
-            properties: {
-                Label: {
-                    multi_select: labelList
-                }
-            }
-        });
-    }
-}
-exports.NotionAdapter = NotionAdapter;
-//# sourceMappingURL=notion.js.map
+//# sourceMappingURL=util.js.map
 
 /***/ }),
 
@@ -1648,8 +2078,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.getBlock.path(args),
                     method: api_endpoints_1.getBlock.method,
-                    query: helpers_1.pick(args, api_endpoints_1.getBlock.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.getBlock.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.getBlock.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.getBlock.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1660,8 +2090,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.updateBlock.path(args),
                     method: api_endpoints_1.updateBlock.method,
-                    query: helpers_1.pick(args, api_endpoints_1.updateBlock.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.updateBlock.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.updateBlock.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.updateBlock.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1672,8 +2102,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.deleteBlock.path(args),
                     method: api_endpoints_1.deleteBlock.method,
-                    query: helpers_1.pick(args, api_endpoints_1.deleteBlock.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.deleteBlock.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.deleteBlock.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.deleteBlock.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1685,8 +2115,8 @@ class Client {
                     return this.request({
                         path: api_endpoints_1.appendBlockChildren.path(args),
                         method: api_endpoints_1.appendBlockChildren.method,
-                        query: helpers_1.pick(args, api_endpoints_1.appendBlockChildren.queryParams),
-                        body: helpers_1.pick(args, api_endpoints_1.appendBlockChildren.bodyParams),
+                        query: (0, helpers_1.pick)(args, api_endpoints_1.appendBlockChildren.queryParams),
+                        body: (0, helpers_1.pick)(args, api_endpoints_1.appendBlockChildren.bodyParams),
                         auth: args === null || args === void 0 ? void 0 : args.auth,
                     });
                 },
@@ -1697,8 +2127,8 @@ class Client {
                     return this.request({
                         path: api_endpoints_1.listBlockChildren.path(args),
                         method: api_endpoints_1.listBlockChildren.method,
-                        query: helpers_1.pick(args, api_endpoints_1.listBlockChildren.queryParams),
-                        body: helpers_1.pick(args, api_endpoints_1.listBlockChildren.bodyParams),
+                        query: (0, helpers_1.pick)(args, api_endpoints_1.listBlockChildren.queryParams),
+                        body: (0, helpers_1.pick)(args, api_endpoints_1.listBlockChildren.bodyParams),
                         auth: args === null || args === void 0 ? void 0 : args.auth,
                     });
                 },
@@ -1714,8 +2144,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.listDatabases.path(),
                     method: api_endpoints_1.listDatabases.method,
-                    query: helpers_1.pick(args, api_endpoints_1.listDatabases.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.listDatabases.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.listDatabases.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.listDatabases.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1726,8 +2156,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.getDatabase.path(args),
                     method: api_endpoints_1.getDatabase.method,
-                    query: helpers_1.pick(args, api_endpoints_1.getDatabase.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.getDatabase.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.getDatabase.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.getDatabase.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1738,8 +2168,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.queryDatabase.path(args),
                     method: api_endpoints_1.queryDatabase.method,
-                    query: helpers_1.pick(args, api_endpoints_1.queryDatabase.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.queryDatabase.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.queryDatabase.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.queryDatabase.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1750,8 +2180,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.createDatabase.path(),
                     method: api_endpoints_1.createDatabase.method,
-                    query: helpers_1.pick(args, api_endpoints_1.createDatabase.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.createDatabase.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.createDatabase.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.createDatabase.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1762,8 +2192,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.updateDatabase.path(args),
                     method: api_endpoints_1.updateDatabase.method,
-                    query: helpers_1.pick(args, api_endpoints_1.updateDatabase.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.updateDatabase.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.updateDatabase.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.updateDatabase.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1776,8 +2206,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.createPage.path(),
                     method: api_endpoints_1.createPage.method,
-                    query: helpers_1.pick(args, api_endpoints_1.createPage.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.createPage.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.createPage.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.createPage.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1788,8 +2218,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.getPage.path(args),
                     method: api_endpoints_1.getPage.method,
-                    query: helpers_1.pick(args, api_endpoints_1.getPage.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.getPage.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.getPage.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.getPage.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1800,8 +2230,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.updatePage.path(args),
                     method: api_endpoints_1.updatePage.method,
-                    query: helpers_1.pick(args, api_endpoints_1.updatePage.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.updatePage.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.updatePage.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.updatePage.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1813,8 +2243,8 @@ class Client {
                     return this.request({
                         path: api_endpoints_1.getPageProperty.path(args),
                         method: api_endpoints_1.getPageProperty.method,
-                        query: helpers_1.pick(args, api_endpoints_1.getPageProperty.queryParams),
-                        body: helpers_1.pick(args, api_endpoints_1.getPageProperty.bodyParams),
+                        query: (0, helpers_1.pick)(args, api_endpoints_1.getPageProperty.queryParams),
+                        body: (0, helpers_1.pick)(args, api_endpoints_1.getPageProperty.bodyParams),
                         auth: args === null || args === void 0 ? void 0 : args.auth,
                     });
                 },
@@ -1828,8 +2258,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.getUser.path(args),
                     method: api_endpoints_1.getUser.method,
-                    query: helpers_1.pick(args, api_endpoints_1.getUser.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.getUser.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.getUser.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.getUser.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1840,8 +2270,8 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.listUsers.path(),
                     method: api_endpoints_1.listUsers.method,
-                    query: helpers_1.pick(args, api_endpoints_1.listUsers.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.listUsers.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.listUsers.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.listUsers.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
@@ -1852,15 +2282,15 @@ class Client {
                 return this.request({
                     path: api_endpoints_1.getSelf.path(),
                     method: api_endpoints_1.getSelf.method,
-                    query: helpers_1.pick(args, api_endpoints_1.getSelf.queryParams),
-                    body: helpers_1.pick(args, api_endpoints_1.getSelf.bodyParams),
+                    query: (0, helpers_1.pick)(args, api_endpoints_1.getSelf.queryParams),
+                    body: (0, helpers_1.pick)(args, api_endpoints_1.getSelf.bodyParams),
                     auth: args === null || args === void 0 ? void 0 : args.auth,
                 });
             },
         };
         __classPrivateFieldSet(this, _Client_auth, options === null || options === void 0 ? void 0 : options.auth, "f");
         __classPrivateFieldSet(this, _Client_logLevel, (_a = options === null || options === void 0 ? void 0 : options.logLevel) !== null && _a !== void 0 ? _a : logging_1.LogLevel.WARN, "f");
-        __classPrivateFieldSet(this, _Client_logger, (_b = options === null || options === void 0 ? void 0 : options.logger) !== null && _b !== void 0 ? _b : logging_1.makeConsoleLogger(package_json_1.name), "f");
+        __classPrivateFieldSet(this, _Client_logger, (_b = options === null || options === void 0 ? void 0 : options.logger) !== null && _b !== void 0 ? _b : (0, logging_1.makeConsoleLogger)(package_json_1.name), "f");
         __classPrivateFieldSet(this, _Client_prefixUrl, ((_c = options === null || options === void 0 ? void 0 : options.baseUrl) !== null && _c !== void 0 ? _c : "https://api.notion.com") + "/v1/", "f");
         __classPrivateFieldSet(this, _Client_timeoutMs, (_d = options === null || options === void 0 ? void 0 : options.timeoutMs) !== null && _d !== void 0 ? _d : 60000, "f");
         __classPrivateFieldSet(this, _Client_notionVersion, (_e = options === null || options === void 0 ? void 0 : options.notionVersion) !== null && _e !== void 0 ? _e : Client.defaultNotionVersion, "f");
@@ -1908,14 +2338,14 @@ class Client {
             }), __classPrivateFieldGet(this, _Client_timeoutMs, "f"));
             const responseText = await response.text();
             if (!response.ok) {
-                throw errors_1.buildRequestError(response, responseText);
+                throw (0, errors_1.buildRequestError)(response, responseText);
             }
             const responseJson = JSON.parse(responseText);
             this.log(logging_1.LogLevel.INFO, `request success`, { method, path });
             return responseJson;
         }
         catch (error) {
-            if (!errors_1.isNotionClientError(error)) {
+            if (!(0, errors_1.isNotionClientError)(error)) {
                 throw error;
             }
             // Log the error if it's one of our known error types
@@ -1923,7 +2353,7 @@ class Client {
                 code: error.code,
                 message: error.message,
             });
-            if (errors_1.isHTTPResponseError(error)) {
+            if ((0, errors_1.isHTTPResponseError)(error)) {
                 // The response body may contain sensitive information so it is logged separately at the DEBUG level
                 this.log(logging_1.LogLevel.DEBUG, `failed response body`, {
                     body: error.body,
@@ -1939,8 +2369,8 @@ class Client {
         return this.request({
             path: api_endpoints_1.search.path(),
             method: api_endpoints_1.search.method,
-            query: helpers_1.pick(args, api_endpoints_1.search.queryParams),
-            body: helpers_1.pick(args, api_endpoints_1.search.bodyParams),
+            query: (0, helpers_1.pick)(args, api_endpoints_1.search.queryParams),
+            body: (0, helpers_1.pick)(args, api_endpoints_1.search.bodyParams),
             auth: args === null || args === void 0 ? void 0 : args.auth,
         });
     }
@@ -1951,7 +2381,7 @@ class Client {
      * @param args Arguments to send to the console
      */
     log(level, message, extraInfo) {
-        if (logging_1.logLevelSeverity(level) >= logging_1.logLevelSeverity(__classPrivateFieldGet(this, _Client_logLevel, "f"))) {
+        if ((0, logging_1.logLevelSeverity)(level) >= (0, logging_1.logLevelSeverity)(__classPrivateFieldGet(this, _Client_logLevel, "f"))) {
             __classPrivateFieldGet(this, _Client_logger, "f").call(this, level, message, extraInfo);
         }
     }
@@ -1975,7 +2405,7 @@ class Client {
 }
 exports.default = Client;
 _Client_auth = new WeakMap(), _Client_logLevel = new WeakMap(), _Client_logger = new WeakMap(), _Client_prefixUrl = new WeakMap(), _Client_timeoutMs = new WeakMap(), _Client_notionVersion = new WeakMap(), _Client_fetch = new WeakMap(), _Client_agent = new WeakMap(), _Client_userAgent = new WeakMap();
-Client.defaultNotionVersion = "2021-08-16";
+Client.defaultNotionVersion = "2022-02-22";
 //# sourceMappingURL=Client.js.map
 
 /***/ }),
@@ -2050,12 +2480,9 @@ exports.updateBlock = {
     pathParams: ["block_id"],
     queryParams: [],
     bodyParams: [
-        "heading_1",
+        "embed",
         "type",
         "archived",
-        "heading_2",
-        "heading_3",
-        "embed",
         "bookmark",
         "image",
         "video",
@@ -2068,6 +2495,10 @@ exports.updateBlock = {
         "breadcrumb",
         "table_of_contents",
         "link_to_page",
+        "table_row",
+        "heading_1",
+        "heading_2",
+        "heading_3",
         "paragraph",
         "bulleted_list_item",
         "numbered_list_item",
@@ -2077,6 +2508,7 @@ exports.updateBlock = {
         "template",
         "callout",
         "synced_block",
+        "table",
     ],
     path: (p) => `blocks/${p.block_id}`,
 };
@@ -2112,7 +2544,7 @@ exports.updateDatabase = {
     method: "patch",
     pathParams: ["database_id"],
     queryParams: [],
-    bodyParams: ["title", "icon", "cover", "properties"],
+    bodyParams: ["title", "icon", "cover", "properties", "archived"],
     path: (p) => `databases/${p.database_id}`,
 };
 exports.queryDatabase = {
@@ -2190,7 +2622,7 @@ class NotionClientErrorBase extends Error {
  * @returns `true` if error is a `NotionClientError`.
  */
 function isNotionClientError(error) {
-    return helpers_1.isObject(error) && error instanceof NotionClientErrorBase;
+    return (0, helpers_1.isObject)(error) && error instanceof NotionClientErrorBase;
 }
 exports.isNotionClientError = isNotionClientError;
 /**
@@ -2339,7 +2771,7 @@ function parseAPIErrorResponseBody(body) {
     catch (parseError) {
         return;
     }
-    if (!helpers_1.isObject(parsed) ||
+    if (!(0, helpers_1.isObject)(parsed) ||
         typeof parsed["message"] !== "string" ||
         !isAPIErrorCode(parsed["code"])) {
         return;
@@ -2446,7 +2878,7 @@ function logLevelSeverity(level) {
         case LogLevel.ERROR:
             return 80;
         default:
-            return helpers_1.assertNever(level);
+            return (0, helpers_1.assertNever)(level);
     }
 }
 exports.logLevelSeverity = logLevelSeverity;

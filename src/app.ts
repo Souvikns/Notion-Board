@@ -1,75 +1,84 @@
-import { NotionAdapter } from './notion';
-import {EventType, Issue, IssueState} from './model';
+import { NotionAdapter } from './adapter';
+import { Issue, Issues } from './models'
 
-interface ActionEvents {
-    [name: string]: Function
-}
+export class App {
+  constructor(
+    private notion: NotionAdapter
+  ) { }
 
-class ActionHandler {
+  async initialize(githubIssues: Array<Issue>): Promise<{ response?: string, error?: Error | unknown }> {
+    const { error } = await this.notion.setup();
 
-    private actionEvents: ActionEvents = {};
-
-    protected register(eventType: EventType, cb: Function) {
-        this.actionEvents[eventType] = cb
-    }
-
-    async run(eventType: string, issue: Issue) {
-        const cb = this.actionEvents[eventType];
-        if (cb) {
-            await cb(issue);
-        }
-    }
-}
-
-
-export default class App extends ActionHandler {
-    private readonly notion: NotionAdapter;
-    constructor(notion: NotionAdapter) {
-        super();
-        this.notion = notion;
-        this.init();
-    }
-
-    private init(){
-        super.register('issues.opened', async (issue: Issue) => {
-            await this.notion.createPage({
-                title: issue.title,
-                id: issue.id,
-                state: issue.state,
-                url: issue.html_url,
-                body: issue.body
-            })
-
-            await this.notion.updateLabel(issue.id, issue.labels);
-
-            console.log('Issue successfully Synced');
+    for (const ghIssue of githubIssues) {
+      const page = await this.notion.isPageAvailable(ghIssue.id);
+      if(!page) {
+        const {error} = await this.notion.createPage({
+          body: ghIssue.body,
+          id: ghIssue.id,
+          state: ghIssue.state,
+          title: ghIssue.title,
+          url: ghIssue.html_url,
+          lables: ghIssue.labels
         });
-
-        super.register('issues.closed', async (issue: Issue) => {
-            await this.notion.updateState(issue.id, issue.state);
-            console.log("Issue State successfully Synced");
-        });
-
-        super.register('issues.labeled', async (issue: Issue) => {
-          await this.notion.updateLabel(issue.id, issue.labels);
-          console.log('label synced');  
-        })
-
-        super.register('issues.unlabeled', async (issues: Issue) => {
-            await this.notion.updateLabel(issues.id, issues.labels);
-            console.log('label synced');
-        })
-
-        super.register('issues.reopened', async (issue: Issue) => {
-            await this.notion.updateState(issue.id, issue.state);
-            console.log("state synced");
-        })
-
-        super.register('issues.edited', async (issue: Issue) => {
-            await this.notion.updatePage(issue.id, issue.title);
-            console.log('issue synced');
-        })
-
+        console.log(error);
+      }else {
+        const {error} = await this.notion.updateCompletePage(ghIssue, page.id);
+        console.log(error);
+      }
     }
 
+    return {
+      response: '✅ Setup Complete!!',
+      error: error
+    }
+  }
+
+  async IssueActionHandler(eventType: string, issue: Issue) {
+    if (eventType.split('.')[0] === 'issues') {
+      switch (eventType) {
+        case Issues().opened():
+          return await this.issueOpened(issue);
+        case Issues().closed():
+          return await this.issueClosed(issue);
+        case Issues().edited():
+          return await this.issueEdited(issue);
+        case Issues().reopened():
+          return await this.issueClosed(issue);
+        case Issues().labeled():
+          return await this.issueLabelUpdated(issue);
+        case Issues().unlabeled():
+          return this.issueLabelUpdated(issue);
+        default:
+          return console.log('🚩 Something happend that I am not accountable for.')
+      }
+    }
+  }
+
+  private async issueOpened(issue: Issue) {
+    console.log(issue);
+    await this.notion.createPage({
+      title: issue.title,
+      id: issue.id,
+      state: issue.state,
+      url: issue.html_url,
+      body: issue.body || ''
+    })
+    await this.notion.updateLabel(issue.id, issue.labels);
+    console.log('✅ Issue successfully Synced');
+  }
+
+  private async issueClosed(issue: Issue) {
+    await this.notion.updateState(issue.state, issue.id);
+    console.log('✅ Issue state successfully updated');
+  }
+
+  private async issueEdited(issue: Issue) {
+    await this.notion.updatePage(issue.id, issue.title, issue.body);
+    console.log('✅ Issue successfully synced');
+  }
+
+  private async issueLabelUpdated(issue: Issue) {
+    await this.notion.updateLabel(issue.id, issue.labels);
+    console.log('✅ Labels synced');
+  }
 }
