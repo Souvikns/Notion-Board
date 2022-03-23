@@ -98,7 +98,7 @@ export class NotionAdapter extends NotionClient {
                 {
                   type: 'text',
                   text: {
-                    content: input.body
+                    content: input.body || ''
                   }
                 },
               ]
