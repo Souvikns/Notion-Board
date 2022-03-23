@@ -102,23 +102,7 @@ class NotionAdapter extends NotionClient {
                     State: {
                         select: { name: input.state }
                     }
-                },
-                children: [
-                    {
-                        object: 'block',
-                        type: 'paragraph',
-                        paragraph: {
-                            text: [
-                                {
-                                    type: 'text',
-                                    text: {
-                                        content: input.body || ''
-                                    }
-                                },
-                            ]
-                        }
-                    }
-                ]
+                }
             });
             return {};
         }
