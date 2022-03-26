@@ -144,7 +144,7 @@ class NotionAdapter extends NotionClient {
             ID: {
                 number: issue.id()
             },
-            label: {
+            Label: {
                 multi_select: issue.getLabelList()
             }
         };
