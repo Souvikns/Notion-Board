@@ -55,6 +55,7 @@ class GithubAdapter {
             per_page: 100,
             state: 'open'
         }, response => response.data.map(issue => new issue_1.Issue(issue)));
+        console.log(issues);
         return issues;
     }
 }
@@ -227,6 +228,7 @@ class App {
         logger_1.logger.info('Fetching all Issuess');
         const issues = await this.githubAdapter.fetchAllIssues(this.GitHubToken);
         for (const issue of issues) {
+            console.log(issue);
             const pageId = await this.notionAdapter.findPage(issue.id());
             if (pageId) {
                 this.notionAdapter.updatePage(issue.id(), issue);

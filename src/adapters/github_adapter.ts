@@ -21,6 +21,7 @@ export class GithubAdapter {
             per_page: 100,
             state: 'open'
         }, response => response.data.map(issue => new Issue(issue)));
+        console.log(issues);
         return issues;
     }
 }

@@ -46,6 +46,7 @@ export class App {
         const issues = await this.githubAdapter.fetchAllIssues(this.GitHubToken);
 
         for (const issue of issues) {
+            console.log(issue);
             const pageId = await this.notionAdapter.findPage(issue.id());
             if (pageId) {
                 this.notionAdapter.updatePage(issue.id(), issue);
