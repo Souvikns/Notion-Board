@@ -14,6 +14,12 @@ inputs:
   NOTION_DATABASE:
     description: 'Your Notion Database ID'
     requried: true
+  setup:
+    required: false
+    type: boolean
+  syncIssues:
+    requried: false
+    type: boolean
   
 runs:
   using: node12
