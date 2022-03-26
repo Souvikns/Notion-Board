@@ -55,7 +55,6 @@ class GithubAdapter {
             per_page: 100,
             state: 'open'
         }, response => response.data.map(issue => new issue_1.Issue(issue)));
-        console.log(issues);
         return issues;
     }
 }
