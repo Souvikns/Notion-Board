@@ -1,7 +1,7 @@
-import {Notion} from '../notion'
+import {App} from '../app';
 
 describe('Notion Adapter should', () => {
     it('be defined', () => {
-        expect(Notion).toBeDefined();
+        expect(App).toBeDefined();
     })
 })

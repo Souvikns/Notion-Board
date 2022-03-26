@@ -3,6 +3,13 @@ on:
   issues:
   issue_comment:
   workflow_dispatch:
+    inputs:
+      setup:
+        description: 'Populate your notion database with all the requried properties'
+        type: boolean
+      syncIssues:
+        description: 'sync all other existing issues in this repo'
+        type: boolean
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,6 +17,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: Notion Board
         uses: ./
+        with:
+          setup: ${{github.event.inputs.setup}}
+          syncIssues: ${{github.event.inputs.syncIssues}}
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}

@@ -1,85 +1,58 @@
-import { NotionAdapter } from './adapter';
-import { Issue, Issues } from './models'
+import { GithubAdapter } from "./adapters/github_adapter";
+import { NotionAdapter } from "./adapters/notion_adapter";
+import { logger } from "./logger";
+import { Issue } from "./models/issue";
 
 export class App {
-  constructor(
-    private notion: NotionAdapter
-  ) { }
 
-  async initialize(githubIssues: Array<Issue>): Promise<{ response?: string, error?: Error | unknown }> {
-    const { error } = await this.notion.setup();
+    constructor(
+        private readonly notionAdapter: NotionAdapter,
+        private readonly githubAdapter: GithubAdapter,
+        private readonly EventName: string,
+        private readonly GitHubToken: string
+    ){}
 
-    for (const ghIssue of githubIssues) {
-      const page = await this.notion.isPageAvailable(ghIssue.id);
-      console.log(ghIssue);
-      if(!page) {
-        const {error} = await this.notion.createPage({
-          body: ghIssue.body,
-          id: ghIssue.id,
-          state: ghIssue.state,
-          title: ghIssue.title,
-          url: ghIssue.html_url,
-          lables: ghIssue.labels
-        });
-        console.log(error);
-      }else {
-        const {error} = await this.notion.updateCompletePage(ghIssue, page.id);
-        console.log(error);
-      }
+    async run() {
+        if(this.EventName === 'issues') {
+            await this.IssueEventHandler(this.githubAdapter.action(), this.githubAdapter.getIssue());
+        }
     }
 
-    return {
-      response: '✅ Setup Complete!!',
-      error: error
+    async workflowDispatchHandler(setup?: boolean, syncIssues?: boolean){
+        if(setup) {
+            await this.setupNotionDatabase();
+        }
+
+        if(syncIssues) {
+            await this.syncIssues();
+        }
     }
-  }
 
-  async IssueActionHandler(eventType: string, issue: Issue) {
-    if (eventType.split('.')[0] === 'issues') {
-      switch (eventType) {
-        case Issues().opened():
-          return await this.issueOpened(issue);
-        case Issues().closed():
-          return await this.issueClosed(issue);
-        case Issues().edited():
-          return await this.issueEdited(issue);
-        case Issues().reopened():
-          return await this.issueClosed(issue);
-        case Issues().labeled():
-          return await this.issueLabelUpdated(issue);
-        case Issues().unlabeled():
-          return this.issueLabelUpdated(issue);
-        default:
-          return console.log('🚩 Something happend that I am not accountable for.')
-      }
+    private async IssueEventHandler(action: string, issue: Issue){
+        if(action === 'opened') {
+            this.notionAdapter.createPage(issue)
+        }else {
+            this.notionAdapter.updatePage(issue.id(), issue);
+        }
     }
-  }
 
-  private async issueOpened(issue: Issue) {
-    console.log(issue);
-    await this.notion.createPage({
-      title: issue.title,
-      id: issue.id,
-      state: issue.state,
-      url: issue.html_url,
-      body: issue.body || ''
-    })
-    await this.notion.updateLabel(issue.id, issue.labels);
-    console.log('✅ Issue successfully Synced');
-  }
+    private async setupNotionDatabase(){
+        logger.info('Setting up Notion Database');
+        await this.notionAdapter.setup();
+    }
 
-  private async issueClosed(issue: Issue) {
-    await this.notion.updateState(issue.state, issue.id);
-    console.log('✅ Issue state successfully updated');
-  }
+    private async syncIssues(){
+        logger.info('Fetching all Issuess');
+        const issues = await this.githubAdapter.fetchAllIssues(this.GitHubToken);
 
-  private async issueEdited(issue: Issue) {
-    await this.notion.updatePage(issue.id, issue.title, issue.body);
-    console.log('✅ Issue successfully synced');
-  }
+        for (const issue of issues) {
+            const pageId = await this.notionAdapter.findPage(issue.id());
+            if (pageId) {
+                this.notionAdapter.updatePage(issue.id(), issue);
+            }else {
+                this.notionAdapter.createPage(issue);
+            }
+        }
+    }
 
-  private async issueLabelUpdated(issue: Issue) {
-    await this.notion.updateLabel(issue.id, issue.labels);
-    console.log('✅ Labels synced');
-  }
 }
