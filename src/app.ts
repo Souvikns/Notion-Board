@@ -10,47 +10,52 @@ export class App {
         private readonly githubAdapter: GithubAdapter,
         private readonly EventName: string,
         private readonly GitHubToken: string
-    ){}
+    ) { }
 
     async run() {
-        if(this.EventName === 'issues') {
+        if (this.EventName === 'issues') {
             await this.IssueEventHandler(this.githubAdapter.action(), this.githubAdapter.getIssue());
         }
     }
 
-    async workflowDispatchHandler(setup?: boolean, syncIssues?: boolean){
-        if(setup) {
+    async workflowDispatchHandler(setup?: boolean, syncIssues?: boolean) {
+        if (setup) {
             await this.setupNotionDatabase();
         }
 
-        if(syncIssues) {
+        if (syncIssues) {
             await this.syncIssues();
         }
     }
 
-    private async IssueEventHandler(action: string, issue: Issue){
-        if(action === 'opened') {
+    private async IssueEventHandler(action: string, issue: Issue) {
+        if (action === 'opened') {
             this.notionAdapter.createPage(issue)
-        }else {
+        } else {
             this.notionAdapter.updatePage(issue.id(), issue);
         }
     }
 
-    private async setupNotionDatabase(){
+    private async setupNotionDatabase() {
         logger.info('Setting up Notion Database');
         await this.notionAdapter.setup();
     }
 
-    private async syncIssues(){
+    private async syncIssues() {
         logger.info('Fetching all Issuess');
         const issues = await this.githubAdapter.fetchAllIssues(this.GitHubToken);
 
         for (const issue of issues) {
             console.log(issue.id());
-            const pageId = await this.notionAdapter.findPage(issue.id());
+            let pageId;
+            try {
+                pageId = await this.notionAdapter.findPage(issue.id());
+            } catch (error) {
+                console.log(error);
+            }
             if (pageId) {
                 this.notionAdapter.updatePage(issue.id(), issue);
-            }else {
+            } else {
                 this.notionAdapter.createPage(issue);
             }
         }
