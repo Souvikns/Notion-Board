@@ -134,8 +134,8 @@ class NotionAdapter extends NotionClient {
                 }
             }
         });
-        const page = pages.results[0].id;
-        return page ? page : false;
+        const page = pages.results[0];
+        return page ? page.id : false;
     }
     sleep(ms = 1000) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -239,7 +239,6 @@ class App {
         logger_1.logger.info('Fetching all Issuess');
         const issues = await this.githubAdapter.fetchAllIssues(this.GitHubToken);
         for (const issue of issues) {
-            console.log(issue.id());
             let pageId;
             try {
                 pageId = await this.notionAdapter.findPage(issue.id());

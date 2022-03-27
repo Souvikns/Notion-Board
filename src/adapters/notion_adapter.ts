@@ -57,8 +57,8 @@ export class NotionAdapter extends NotionClient {
                 }
             }
         });
-        const page = pages.results[0].id;
-        return page ? page : false;
+        const page = pages.results[0];
+        return page ? page.id : false;
     }
 
     sleep(ms: number = 1000) {
