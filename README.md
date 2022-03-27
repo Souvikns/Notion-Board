@@ -56,7 +56,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Notion Board
-        uses: Souvikns/Notion-Board@2.3.0
+        uses: Souvikns/Notion-Board@2.2.0
         with:
           setup: ${{github.event.inputs.setup}}
           syncIssues: ${{github.event.inputs.syncIssues}}
