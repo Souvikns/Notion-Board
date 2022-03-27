@@ -2,6 +2,7 @@ import * as github from '@actions/github';
 import { Issue } from '../models/issue';
 export class GithubAdapter {
     constructor(
+        private readonly issueType?: string
     ) { }
 
     action() {
@@ -19,8 +20,20 @@ export class GithubAdapter {
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             per_page: 100,
-            state: 'open'
+            state: this.prepareIssueType()
         }, response => response.data.map(issue => new Issue(issue)));
         return issues;
+    }
+
+    private prepareIssueType() {
+        if (this.issueType === 'all') {
+            return 'all'
+        }
+
+        if (this.issueType === 'close') {
+            return 'closed'
+        }
+
+        return 'open'
     }
 }

@@ -20,6 +20,9 @@ inputs:
   syncIssues:
     requried: false
     type: boolean
+  issueType:
+    requried: false
+    type: string
   
 runs:
   using: node12

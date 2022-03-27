@@ -17,7 +17,7 @@ export const run = async () => {
             NotionApiKey,
             NotionDatabaseId
         ),
-        new GithubAdapter(),
+        new GithubAdapter(core.getInput('issueType')),
         EventName as string,
         Token
     );

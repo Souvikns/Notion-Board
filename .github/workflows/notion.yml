@@ -10,6 +10,14 @@ on:
       syncIssues:
         description: 'sync all other existing issues in this repo'
         type: boolean
+      issueType:
+        type: choice
+        description: 'The issue type you want to sync'
+        options:
+          - all
+          - open
+          - closed
+        default: open
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,6 +28,7 @@ jobs:
         with:
           setup: ${{github.event.inputs.setup}}
           syncIssues: ${{github.event.inputs.syncIssues}}
+          issueType: ${{github.event.inputs.issueType}}
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}

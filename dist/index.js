@@ -38,7 +38,10 @@ exports.GithubAdapter = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const issue_1 = __nccwpck_require__(3849);
 class GithubAdapter {
-    constructor() { }
+    issueType;
+    constructor(issueType) {
+        this.issueType = issueType;
+    }
     action() {
         return github.context.payload.action || '';
     }
@@ -53,9 +56,18 @@ class GithubAdapter {
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             per_page: 100,
-            state: 'open'
+            state: this.prepareIssueType()
         }, response => response.data.map(issue => new issue_1.Issue(issue)));
         return issues;
+    }
+    prepareIssueType() {
+        if (this.issueType === 'all') {
+            return 'all';
+        }
+        if (this.issueType === 'close') {
+            return 'closed';
+        }
+        return 'open';
     }
 }
 exports.GithubAdapter = GithubAdapter;
@@ -290,7 +302,7 @@ const run = async () => {
         throw new Error('Missing Notion Api Key');
     if (!NotionDatabaseId)
         throw new Error('Missing Notion Database ID');
-    const app = new app_1.App(new notion_adapter_1.NotionAdapter(NotionApiKey, NotionDatabaseId), new github_adapter_1.GithubAdapter(), EventName, Token);
+    const app = new app_1.App(new notion_adapter_1.NotionAdapter(NotionApiKey, NotionDatabaseId), new github_adapter_1.GithubAdapter(core.getInput('issueType')), EventName, Token);
     if (EventName === 'workflow_dispatch') {
         await app.workflowDispatchHandler(core.getBooleanInput('setup'), core.getBooleanInput('syncIssues'));
     }
