@@ -42,20 +42,30 @@ on:
       syncIssues:
         description: 'sync all other existing issues in this repo'
         type: boolean
+      issueType:
+        type: choice
+        description: 'The issue type you want to sync'
+        options:
+          - all
+          - open
+          - closed
+        default: open
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Notion Board
-        uses: Souvikns/Notion-Board@2.1.0
+        uses: Souvikns/Notion-Board@2.3.0
         with:
           setup: ${{github.event.inputs.setup}}
           syncIssues: ${{github.event.inputs.syncIssues}}
+          issueType: ${{github.event.inputs.issueType}}
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE: ${{ secrets.NOTION_DATABASE }}
+          
 ```
 
 ### Adding `env` Variables
