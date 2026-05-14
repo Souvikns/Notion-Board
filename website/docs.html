@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — Notion Board</title>
+  <meta name="description" content="Documentation for Notion-Board. Learn how to sync GitHub Issues with Notion.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="index.html" class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </svg>
+        <span>Notion Board</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="docs.html" class="nav-link">Docs</a>
+        <a href="https://github.com/Souvikns/Notion-Board" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div class="nav-cta-group" id="navCtas">
+        <a href="https://github.com/Souvikns/Notion-Board" class="nav-star-badge" id="githubStarBadge" target="_blank" rel="noopener" aria-label="Star on GitHub">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+          <span class="nav-star-right" id="githubStarCount">—</span>
+        </a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="docs-layout">
+      <aside class="docs-sidebar">
+        <p class="docs-sidebar-title">On this page</p>
+        <nav class="docs-nav" id="docsNav">
+          <a href="#setup-guide" class="active">Setup Guide</a>
+          <a href="#setting-up-github-workflow">Setting up GitHub workflow</a>
+          <a href="#adding-env-variables">Adding env Variables</a>
+          <a href="#setting-up-notion-database-properties">Setting up Notion Database Properties</a>
+          <a href="#sync-your-existing-issues">Sync Your Existing Issues</a>
+          <a href="#notion-template">Notion Template</a>
+          <a href="#reporting-issues">Reporting Issues</a>
+          <a href="#contributing">Contributing</a>
+          <a href="#community-support">Community Support</a>
+          <a href="#license">License</a>
+        </nav>
+      </aside>
+
+      <article class="docs-content" id="docsContent">
+        <h1>Documentation</h1>
+
+        <p><strong>Notion-Board</strong> brings Notion and GitHub closer than before. Notion-board lets you sync your GitHub Issues with notion database, so whenever a new issue is opened or existing issue is updated in GitHub it syncs your notion database accordingly.</p>
+
+        <blockquote>
+          <p>Currently <strong>Notion-Board</strong> syncs issue title, lables and state. In future we are going to support more features so stay tuned.</p>
+        </blockquote>
+
+        <p>You can try it out by opening a new issue in this repository and see it get synced in this <a href="https://souvikns.notion.site/64bc98b98e6242c9bbc1cbedf9c93261?v=621cc0ced4614c56831a21f8cf974674" target="_blank" rel="noopener">Notion Database</a>.</p>
+
+        <h2 id="setup-guide">Setup Guide</h2>
+        <p>To use <strong>Notion-Board</strong> you need to write a GitHub workflow and setup some unique properties in your notion database as well. In this guide we are going to help you setup Notion-board and get started.</p>
+
+        <h3 id="setting-up-github-workflow">Setting up GitHub workflow</h3>
+        <p>Create a file <code>notion.yaml</code> in the folder <code>.github/workflows</code> and add these lines —</p>
+
+<pre><code>name: Notion Board
+on:
+  issues:
+  issue_comment:
+  workflow_dispatch:
+    inputs:
+      setup:
+        description: 'Populate your notion database with all the requried properties'
+        type: boolean
+      syncIssues:
+        description: 'sync all other existing issues in this repo'
+        type: boolean
+      issueType:
+        type: choice
+        description: 'The issue type you want to sync'
+        options:
+          - all
+          - open
+          - closed
+        default: open
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Notion Board
+        uses: Souvikns/Notion-Board@2.2.0
+        with:
+          setup: ${{github.event.inputs.setup}}
+          syncIssues: ${{github.event.inputs.syncIssues}}
+          issueType: ${{github.event.inputs.issueType}}
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE: ${{ secrets.NOTION_DATABASE }}</code></pre>
+
+        <h3 id="adding-env-variables">Adding <code>env</code> Variables</h3>
+        <p>Now you need to setup some <code>env</code> variables for the workflow to run properly —</p>
+
+        <table>
+          <thead>
+            <tr><th>variable name</th><th>Description</th><th>Required</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>GITHUB_TOKEN</code></td><td>Github workflow token, this is added by default</td><td>true</td></tr>
+            <tr><td><code>NOTION_API_KEY</code></td><td>Notion Integration token</td><td>true</td></tr>
+            <tr><td><code>NOTION_DATABASE</code></td><td>Notion Database ID</td><td>true</td></tr>
+          </tbody>
+        </table>
+
+        <ul>
+          <li>To learn how to add custom env variables follow <a href="https://damienaicheh.github.io/github/actions/2021/04/15/environment-variables-secrets-github-actions-en.html" target="_blank" rel="noopener">this blog</a>.</li>
+          <li>To learn how you can create a new <code>notion integration api key</code> you can follow <a href="https://developers.notion.com/docs/getting-started" target="_blank" rel="noopener">this</a> step by step guide from Notion.</li>
+          <li>You can grab your notion <code>database id</code> from the url:</li>
+        </ul>
+
+<pre><code>https://www.notion.so/myworkspace/a8aec43384f447ed84390e8e42c2e089?v=...
+                                  |--------- Database ID --------|</code></pre>
+
+        <ul>
+          <li>To get the url you can right click on the database name from the side bar and copy the link.</li>
+        </ul>
+
+        <h3 id="setting-up-notion-database-properties">Setting up Notion Database Properties</h3>
+        <p>Now that you have successfully completed setting up GitHub side of things you have to add some required <a href="https://www.notion.so/help/guides/database-properties-help-organize-your-teams-information" target="_blank" rel="noopener">notion properties</a> for <strong>Notion-Board</strong> to run properly.</p>
+
+        <p><strong>Notion Properties</strong></p>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>State</td><td><code>Select</code></td></tr>
+            <tr><td>URL</td><td><code>url</code></td></tr>
+            <tr><td>Label</td><td><code>multi-select</code></td></tr>
+            <tr><td>ID</td><td><code>number</code></td></tr>
+          </tbody>
+        </table>
+
+        <p>You can also use the notion <code>workflow_dispatch</code> to automatically setup your notion database.</p>
+        <p><strong>Steps</strong></p>
+        <ol>
+          <li>Just head over to the <code>actions</code> tab and go to <code>Notion Board</code> workflow.</li>
+          <li>Click the <code>Run workflow</code> button and select the first option that you see.</li>
+          <li>This will create the required properties in your notion database.</li>
+        </ol>
+
+        <h3 id="sync-your-existing-issues">Sync Your Existing Issues</h3>
+        <p>If you are adding <strong>Notion-Board</strong> to a project that already has some existing issues, you have to set them up manually. All you have to do is run the <code>workflow</code> with <code>sync all other existing issues in this repo</code> checked.</p>
+
+        <hr>
+
+        <h2 id="notion-template">Notion Template</h2>
+        <blockquote>
+          <p>I hope to make a list of different useful notion templates for you to pick from, you can even submit the one you are using by opening a new Issue.</p>
+        </blockquote>
+
+        <p>Here is a simple barebones <a href="https://souvikns.notion.site/64bc98b98e6242c9bbc1cbedf9c93261?v=621cc0ced4614c56831a21f8cf974674" target="_blank" rel="noopener">Notion Template</a> that you can duplicate to quickly get started. You can also share your notion template that you are using by opening a new issue and we can create a notion template library right here.</p>
+
+        <p><strong>Notion Templates</strong></p>
+        <ul>
+          <li><a href="https://souvikns.notion.site/64bc98b98e6242c9bbc1cbedf9c93261?v=621cc0ced4614c56831a21f8cf974674" target="_blank" rel="noopener">Minimal</a></li>
+          <li>More coming soon...</li>
+        </ul>
+
+        <h2 id="reporting-issues">Reporting Issues</h2>
+        <p>Currently <strong>Notion-Board</strong> is under development and it has a lot of bugs that we are fixing as they come up. Feel free to let us know if you find any bug, it would help the tool get better. To report a bug just open an <a href="https://github.com/Souvikns/Notion-Board/issues" target="_blank" rel="noopener">Issue</a> describing the bug.</p>
+
+        <h2 id="contributing">Contributing</h2>
+        <p>Please take a moment to read our contributing guide to learn about our development process. I would suggest to open an <a href="https://github.com/Souvikns/Notion-Board/issues" target="_blank" rel="noopener">issue</a> first to discuss potential changes/addition.</p>
+
+        <h3>Contributing Guide</h3>
+        <p>This project is built using <a href="https://www.typescriptlang.org/" target="_blank" rel="noopener">TypeScript</a> so you need to have <a href="https://nodejs.org/en/" target="_blank" rel="noopener">Node.js</a> installed in your system. You can download Node.js from <a href="https://nodejs.org/en/download/" target="_blank" rel="noopener">here</a>.</p>
+
+        <h4>Getting Started Quick</h4>
+        <p>In order to contribute to this project, you should:</p>
+        <ol>
+          <li>Clone this repository from your fork.</li>
+          <li>Run <code>npm install</code> in the project directory to install all the required dependencies.</li>
+          <li>Create a new branch with a meaningful name.</li>
+          <li>Develop a new feature or fix a bug you want.</li>
+          <li>Open a pull request to the <code>main</code> branch.
+            <ul>
+              <li>Remember to build and package the code before you commit run —
+                <ul>
+                  <li><code>npm run build</code></li>
+                  <li><code>npm run package</code></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ol>
+
+        <h2 id="community-support">Community Support</h2>
+        <p>Currently <a href="https://github.com/Souvikns/" target="_blank" rel="noopener">I</a> am the sole maintainer of the project, you can star this project to follow its development. Feel free to open issues for any new feature that you want, and I will try to build it. Feel free to fork the project and build the feature for yourself if I am too slow.</p>
+
+        <h2 id="license">License</h2>
+        <p>This software is licensed under Apache-2.0, see the <a href="https://github.com/Souvikns/Notion-Board/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a> file for more information.</p>
+      </article>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo" style="margin-bottom: var(--space-xs);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            </svg>
+            <span>Notion Board</span>
+          </a>
+          <p class="footer-brand-text">Open-source GitHub Action to sync issues with Notion. Built for teams who live in both tools.</p>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Product</p>
+          <div class="footer-links">
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="docs.html" class="footer-link">Documentation</a>
+            <a href="https://github.com/Souvikns/Notion-Board/releases" class="footer-link" target="_blank" rel="noopener">Changelog</a>
+          </div>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Resources</p>
+          <div class="footer-links">
+            <a href="https://github.com/Souvikns/Notion-Board" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://souvikns.notion.site/64bc98b98e6242c9bbc1cbedf9c93261?v=621cc0ced4614c56831a21f8cf974674" class="footer-link" target="_blank" rel="noopener">Notion Template</a>
+            <a href="https://github.com/Souvikns/Notion-Board/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
+          </div>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Legal</p>
+          <div class="footer-links">
+            <a href="https://github.com/Souvikns/Notion-Board/blob/main/LICENSE" class="footer-link" target="_blank" rel="noopener">License</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; Notion-Board contributors. Apache-2.0 License.</span>
+        <span>Built with GitHub Actions &amp; Notion API.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

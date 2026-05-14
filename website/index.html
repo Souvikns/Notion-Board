@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notion Board — Sync GitHub Issues with Notion</title>
+  <meta name="description" content="Notion-Board brings Notion and GitHub closer. Sync your GitHub Issues with a Notion database automatically.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <div class="container">
+      <a href="index.html" class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </svg>
+        <span>Notion Board</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="docs.html" class="nav-link">Docs</a>
+        <a href="https://github.com/Souvikns/Notion-Board" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div class="nav-cta-group" id="navCtas">
+        <a href="https://github.com/Souvikns/Notion-Board" class="nav-star-badge" id="githubStarBadge" target="_blank" rel="noopener" aria-label="Star on GitHub">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+          <span class="nav-star-right" id="githubStarCount">—</span>
+        </a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-band">
+    <div class="hero-mesh" aria-hidden="true">
+      <div class="mesh-orb develop-orb"></div>
+      <div class="mesh-orb preview-orb"></div>
+      <div class="mesh-orb ship-orb"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge hero-stagger-1">
+        <span class="dot"></span>
+        <span>Open Source GitHub Action</span>
+      </div>
+      <h1 class="hero-title display-xl hero-stagger-2">
+        Sync GitHub Issues with Notion.
+      </h1>
+      <div class="hero-sync-line hero-stagger-2" aria-hidden="true"></div>
+      <p class="hero-lead body-lg hero-stagger-3">
+        Notion-Board brings Notion and GitHub closer than ever. Automatically sync issue titles, labels, and state to a Notion database.
+      </p>
+      <div class="hero-actions hero-stagger-4">
+        <a href="docs.html" class="btn btn-primary">Read the docs</a>
+        <a href="https://github.com/Souvikns/Notion-Board" class="btn btn-secondary" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+      <p class="hero-meta caption-mono hero-stagger-5">
+        Apache-2.0 License · TypeScript · GitHub Actions
+      </p>
+    </div>
+  </section>
+
+  <!-- Quick Setup / Usage Section -->
+  <section class="showcase-band-light">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Quick Start</p>
+        <h2 class="section-title display-lg">Set up in minutes.</h2>
+        <p class="section-desc body-md">
+          Add a single workflow file to your repository and connect your Notion database. No complex configuration needed.
+        </p>
+      </div>
+
+      <div class="code-editor-mockup">
+        <div class="code-editor-header">
+          <span class="code-dot code-dot-red"></span>
+          <span class="code-dot code-dot-yellow"></span>
+          <span class="code-dot code-dot-green"></span>
+          <span class="code-filename">.github/workflows/notion.yml</span>
+        </div>
+        <button class="code-copy-btn" id="copyBtn" data-target="workflowCode">Copy</button>
+        <div class="code-content" id="workflowCode">
+          <pre><code><span class="code-keyword">name:</span> <span class="code-string">Notion Board</span>
+<span class="code-keyword">on:</span>
+  <span class="code-variable">issues:</span>
+  <span class="code-variable">issue_comment:</span>
+  <span class="code-variable">workflow_dispatch:</span>
+    <span class="code-keyword">inputs:</span>
+      <span class="code-variable">setup:</span>
+        <span class="code-keyword">description:</span> <span class="code-string">'Populate your notion database'</span>
+        <span class="code-keyword">type:</span> <span class="code-plain">boolean</span>
+      <span class="code-variable">syncIssues:</span>
+        <span class="code-keyword">description:</span> <span class="code-string">'Sync all existing issues'</span>
+        <span class="code-keyword">type:</span> <span class="code-plain">boolean</span>
+      <span class="code-variable">issueType:</span>
+        <span class="code-keyword">type:</span> <span class="code-plain">choice</span>
+        <span class="code-keyword">options:</span> [<span class="code-string">all</span>, <span class="code-string">open</span>, <span class="code-string">closed</span>]
+        <span class="code-keyword">default:</span> <span class="code-string">open</span>
+
+<span class="code-keyword">jobs:</span>
+  <span class="code-variable">build:</span>
+    <span class="code-keyword">runs-on:</span> <span class="code-string">ubuntu-latest</span>
+    <span class="code-keyword">steps:</span>
+      - <span class="code-keyword">uses:</span> <span class="code-string">actions/checkout@v2</span>
+      - <span class="code-keyword">name:</span> <span class="code-string">Notion Board</span>
+        <span class="code-keyword">uses:</span> <span class="code-string">Souvikns/Notion-Board@2.2.0</span>
+        <span class="code-keyword">with:</span>
+          <span class="code-variable">setup:</span> <span class="code-plain">${{ github.event.inputs.setup }}</span>
+          <span class="code-variable">syncIssues:</span> <span class="code-plain">${{ github.event.inputs.syncIssues }}</span>
+          <span class="code-variable">issueType:</span> <span class="code-plain">${{ github.event.inputs.issueType }}</span>
+        <span class="code-keyword">env:</span>
+          <span class="code-variable">GITHUB_TOKEN:</span> <span class="code-plain">${{ secrets.GITHUB_TOKEN }}</span>
+          <span class="code-variable">NOTION_API_KEY:</span> <span class="code-plain">${{ secrets.NOTION_API_KEY }}</span>
+          <span class="code-variable">NOTION_DATABASE:</span> <span class="code-plain">${{ secrets.NOTION_DATABASE }}</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="showcase-band-light" style="padding-top: 0;">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Features</p>
+        <h2 class="section-title display-lg">Everything you need to stay in sync.</h2>
+      </div>
+
+      <div class="feature-grid">
+        <div class="card-marketing">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+              <path d="M16 21h5v-5" />
+            </svg>
+          </div>
+          <h3 class="card-title">Real-time sync</h3>
+          <p class="card-body">Issues sync automatically on open, edit, close, and comment events. No manual exports needed.</p>
+        </div>
+
+        <div class="card-marketing">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+          </div>
+          <h3 class="card-title">Labels & state</h3>
+          <p class="card-body">Title, labels, and issue state are synced to your Notion database as structured properties.</p>
+        </div>
+
+        <div class="card-marketing">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          <h3 class="card-title">Notion template</h3>
+          <p class="card-body">Use the included Notion template or bring your own database. Setup required properties in one click.</p>
+        </div>
+
+        <div class="card-marketing">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+          </div>
+          <h3 class="card-title">Existing issues</h3>
+          <p class="card-body">Run a one-time sync to import all open or closed issues into Notion — perfect for mature repositories.</p>
+        </div>
+
+        <div class="card-marketing">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
+            </svg>
+          </div>
+          <h3 class="card-title">Zero config</h3>
+          <p class="card-body">Works with GitHub Actions out of the box. Just add the workflow, set three secrets, and go.</p>
+        </div>
+
+        <div class="card-marketing">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <h3 class="card-title">Open source</h3>
+          <p class="card-body">Apache-2.0 licensed. Audit the code, fork it, or contribute improvements back to the project.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works / Dark band -->
+  <section class="showcase-band-dark">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">How it works</p>
+        <h2 class="section-title display-lg">Three steps to sync.</h2>
+        <p class="section-desc body-md">
+          Notion-Board runs inside GitHub Actions and connects to the Notion API. It reads issue events and maps them to database entries.
+        </p>
+      </div>
+
+      <div class="dark-feature-grid">
+        <div class="dark-feature-card">
+          <h3 class="card-title">1. Create workflow</h3>
+          <p class="card-body">Add a <code>notion.yml</code> file to <code>.github/workflows</code> and reference the Notion-Board action.</p>
+        </div>
+
+        <div class="dark-feature-card">
+          <h3 class="card-title">2. Add secrets</h3>
+          <p class="card-body">Set <code>NOTION_API_KEY</code> and <code>NOTION_DATABASE</code> in your repository secrets.</p>
+        </div>
+
+        <div class="dark-feature-card">
+          <h3 class="card-title">3. Run &amp; relax</h3>
+          <p class="card-body">Trigger the workflow to set up properties, then let it sync issues automatically on every event.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo" style="margin-bottom: var(--space-xs);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            </svg>
+            <span>Notion Board</span>
+          </a>
+          <p class="footer-brand-text">Open-source GitHub Action to sync issues with Notion. Built for teams who live in both tools.</p>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Product</p>
+          <div class="footer-links">
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="docs.html" class="footer-link">Documentation</a>
+            <a href="https://github.com/Souvikns/Notion-Board/releases" class="footer-link" target="_blank" rel="noopener">Changelog</a>
+          </div>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Resources</p>
+          <div class="footer-links">
+            <a href="https://github.com/Souvikns/Notion-Board" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://souvikns.notion.site/64bc98b98e6242c9bbc1cbedf9c93261?v=621cc0ced4614c56831a21f8cf974674" class="footer-link" target="_blank" rel="noopener">Notion Template</a>
+            <a href="https://github.com/Souvikns/Notion-Board/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
+          </div>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Legal</p>
+          <div class="footer-links">
+            <a href="https://github.com/Souvikns/Notion-Board/blob/main/LICENSE" class="footer-link" target="_blank" rel="noopener">License</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; Notion-Board contributors. Apache-2.0 License.</span>
+        <span>Built with GitHub Actions &amp; Notion API.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
